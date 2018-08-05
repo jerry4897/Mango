@@ -3,6 +3,9 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import dropped_blocks
 import arrow
+import menu
+global qd
+global wd
 
 class pallete_part(QGraphicsObject):                        # pallete part : right corner of Window.         
     def __init__(self, parent=None):
@@ -22,7 +25,7 @@ class pallete_part(QGraphicsObject):                        # pallete part : rig
 
         drag = QDrag(event.widget())
         mime = QMimeData()
-        drag.setMimeData(mime)      
+        drag.setMimeData(mime)
         drag.setHotSpot(event.pos().toPoint())
         mime.setText(str(self.shape))
 
@@ -90,12 +93,12 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
     def __init__(self, scene):
         super(qgraphicsView, self).__init__()
         self.scene = scene
-
+        #gScene = scene
         self.setScene(self.scene)
         self.setAcceptDrops(True)
 
         arrow.load_scene(self.scene)
-
+        menu.load_scene(self.scene)
     def dragMoveEvent(self, event):
         event.setAccepted(True)
 
@@ -113,6 +116,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         pos = event.pos()
         #pal = dropped_blocks.graphics(pos, int(event.mimeData().text()))                # Drop(Add) on the graphics
         dropped_blocks.graphics(pos, int(event.mimeData().text()), self.scene)
+        #dropped_blocks.graphics(pos, int(event.mimeData().text()))
         #dropped_blocks.graphics(pos, int(event.mimeData().text()), self.scene)
         #tmp = QPoint(200, 200)
         #dropped_blocks.arrows(pos, tmp, self.scene)
@@ -144,7 +148,7 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
     def __init__(self):
         super(Dock_Code, self).__init__()
         self.initUI()
-    
+        
     def initUI(self):
         self.setWindowTitle('Code')
         self.plaintext = QTextEdit()
@@ -152,6 +156,12 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
         self.setWidget(self.plaintext)
         self.show()
 
+class Dock_Constraints(QDockWidget):
+    def __init__(self):
+        super(Dock_Constraints, self).__init__()
+        self.setWindowTitle('Constraints')
+        self.setWidget(menu.menu_init(0))
+        self.show()
 '''class DockContents(QWidget):                                                # delete?
     _sizehint = None
     def setSizeHint(self, width, height):
@@ -174,7 +184,6 @@ class Window(QMainWindow):                                                 # Mai
 
         graphic = QGraphicsView(scene)
         graphic.show()
-
         self.setCentralWidget(graphic)                                      # Drop zone
 
         self.dock = Dock_Graphics()
@@ -182,6 +191,9 @@ class Window(QMainWindow):                                                 # Mai
         
         self.dock1 = Dock_Code()
         self.addDockWidget(Qt.BottomDockWidgetArea, self.dock1)
+
+        self.dock2 = Dock_Constraints()
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.dock2)
 
         dropped_blocks.click_listen = dropped_blocks.click_listener()             #
     
