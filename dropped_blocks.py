@@ -3,9 +3,12 @@ from PyQt4.QtGui import *
 import sys
 import math
 import arrow
+import menu
+import main
 
 click_listen = None
 num = 0
+#qw = QDockWidget
 '''
 When buttons(neurons) dragged from the pallete, these classes are activated.
 '''
@@ -101,6 +104,7 @@ class graphics_part(QGraphicsObject):                                           
     def __init__(self, parent=None):
         super(graphics_part, self).__init__(parent)
         global num
+        #global qw
         self.color = QColor(Qt.lightGray)
         self.dragOver = True
         self.pos_ = None
@@ -112,6 +116,12 @@ class graphics_part(QGraphicsObject):                                           
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:                                         # drag & drop
             self.setCursor(Qt.ClosedHandCursor)
+            menu.menu_init(1)
+            print(self.index)
+            test_1.change(self, self.pos_, self.index)
+            print(self.index)
+            #main.qd = main.Dock_Constraints(1)
+            #menu.show()
             self.setFlag(self.ItemIsMovable, True)
 
             if(click_listen.flag == 0):                                             # 0 : click background
@@ -128,16 +138,19 @@ class graphics_part(QGraphicsObject):                                           
 
         elif event.button() == Qt.RightButton:                                      # remove
             print("right clicked")
-            tb = TableWidget()
-            tb.show()
-            self.update()
-            #self.setParent(None)
+            #tb = menu.TableWidget()
+            #tb.show()
+            #tb = menu.mytest()
+            #tb.show()
             #self.update()
+            self.setParent(None)
+            self.update()
     '''def mouseReleaseEvent(self, event):
         posm = event.pos()
         if self.contains(posm):
             print("시발")'''
-class TableWidget(QTableWidget):
+
+'''class TableWidget(QTableWidget):
  
     def __init__(self, parent = None):
         QTableWidget.__init__(self, parent)
@@ -147,7 +160,8 @@ class TableWidget(QTableWidget):
         quitAction.triggered.connect(self.test)
         self.addAction(quitAction)
     def test(self):
-        print("wow!")
+        print("wow!")'''
+
 '''class neuron_rec(graphics_part):
     def __init__(self, parent=None):
         super(neuron_rec, self).__init__(parent)
@@ -188,19 +202,18 @@ class neuron_cir(graphics_part):
 
 
 class graphics(graphics_part):
-    #def __init__(self, pos, shape):
     def __init__(self, pos, shape, scene):
         super(graphics, self).__init__()
         self.setFlag(self.ItemHasNoContents)
-        global num
         self.scene = scene
+        #global qw
+        global num
+        #qw = self.scene
         if(shape == 1):
             print("Add Rectangle")
-            #neuron_rec(self).pos_ = pos
             self.scene.addItem(neuron_rec(pos))
         else:
             print("Add Circle")
-            #neuron_cir(self).pos_ = pos
             self.scene.addItem(neuron_cir(pos))
 
         num += 1                                                        # index number for blocks
@@ -231,3 +244,9 @@ class click_listener():
 
         print("dest : ", self.from_.index)
         print(self.from_.connect_list)
+
+class test_1():
+    def __init__(self, parent = None):
+        super(test_1, self).__init__(parent)
+    def change(self, pos, index):
+        self.index = 2
