@@ -35,7 +35,7 @@ class arrows(arrow_part):
     def __init__(self, from_, to_):
         super(arrows, self).__init__()
         self.setFlag(self.ItemHasNoContents)
-        global num
+        #global num
         self.from_ = from_
         self.to_ = to_
 
