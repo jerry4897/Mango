@@ -40,7 +40,7 @@ class menu_block(menu_set):
         self.setHorizontalHeaderLabels(column_headers)
 
         self.setItem(0,0, QTableWidgetItem(str(index)))
-        self.setItem(0,1, QTableWidgetItem(str(shape)))
+        #self.setItem(0,1, QTableWidgetItem(str(shape)))
         self.setItem(0,2, QTableWidgetItem(str(connect_list)))
 
     def edititem(self, item):
@@ -49,21 +49,30 @@ class menu_block(menu_set):
 class right_click_table(QWidget):
 #    def __init__(self, parent = None):
 #        QWidget.__init__(self, parent)
-    def __init__(self, block_list):
+    def __init__(self, block_list, current_block):
         super(right_click_table, self).__init__()
         layout = QGridLayout()
         widget = QWidget()
+        global list_
+        list_ = block_list
+        self.curr = current_block
 
-        i = 0
-        for block in block_list:
+        if current_block.shape == 1:
+            layout.addWidget(QLabel("ID : rectangle " + str(current_block.index)), 0, 0)
+        else:
+            layout.addWidget(QLabel("ID : circle " + str(current_block.index)), 0, 0)
+        layout.addWidget(QLabel("Connection"), 1, 0)
+
+        for i in range(len(block_list)):
             if(block_list[i].shape == 1):
-                layout.addWidget(QCheckBox("rectangle" + " " + str(block_list[i].index), self), i, 0)
+                layout.addWidget(QCheckBox("rectangle" + " " + str(block_list[i].index), self), i+1, 1)
             else:
-                layout.addWidget(QCheckBox("circle" + " " + str(block.index), self), i, 0)
-            i += 1
+                layout.addWidget(QCheckBox("circle" + " " + str(block_list[i].index), self), i+1, 1)
 
         self.delete_button = QPushButton("Delete")
         layout.addWidget(self.delete_button, 0, 1)
+        self.delete_button.clicked.connect(self.remove_block)
+
         widget.setLayout(layout)
 
         self.scroll = QScrollArea()
@@ -75,6 +84,14 @@ class right_click_table(QWidget):
         gLayout = QGridLayout()
         gLayout.addWidget(self.scroll)
         self.setLayout(gLayout)
+
+    def remove_block(self):
+        import sip
+        for i in list_:
+            if(i.index == self.curr.index):
+                list_.remove(i)
+        sip.delete(self.curr)
+        self.curr = None
 
 class load_scene(QGraphicsScene):
     def __init__(self, scene):
