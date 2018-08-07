@@ -1,37 +1,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
-import dropped_blocks
-
-class TableWidget(QTableWidget):
- 
-    def __init__(self, parent = None):
-        QTableWidget.__init__(self, parent)
-        self.setContextMenuPolicy(Qt.ActionsContextMenu)
-         
-        quitAction = QAction("Quit", self)
-        quitAction.triggered.connect(self.test)
-        self.addAction(quitAction)
-
-    def test(self):
-        print("wow!")
-
-class mytest(QWidget):
-    def __init__(self): 
-        super().__init__()
-        print("menu start")
-        self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        # @pyqtSlot('QPoint') 
-    @pyqtSlot(QPoint) 
-    def __context_menu(self, position): 
-        menu = QMenu() 
-        copy_action = menu.addAction("복사하기") 
-        quit_action = menu.addAction("Quit")
-        action = menu.exec_(self.table.mapToGlobal(position)) 
-        if action == quit_action:
-            qApp.quit() 
-        elif action == copy_action: 
-            print("copy...") 
+import main
 
 class menu_set(QTableWidget):
     def __init__(self, parent = None):
@@ -72,13 +42,39 @@ class menu_block(menu_set):
         self.setItem(0,0, QTableWidgetItem(str(index)))
         self.setItem(0,1, QTableWidgetItem(str(shape)))
         self.setItem(0,2, QTableWidgetItem(str(connect_list)))
-        '''self.setItem(1,1, QTableWidgetItem("Item (2,2)"))
-        self.setItem(2,0, QTableWidgetItem("Item (3,1)"))
-        self.setItem(2,1, QTableWidgetItem("Item (3,2)"))
-        self.setItem(3,0, QTableWidgetItem("Item (4,1)"))
-        self.setItem(3,1, QTableWidgetItem("Item (4,2)"))'''
+
     def edititem(self, item):
         pass
+
+class right_click_table(QWidget):
+#    def __init__(self, parent = None):
+#        QWidget.__init__(self, parent)
+    def __init__(self, block_list):
+        super(right_click_table, self).__init__()
+        layout = QGridLayout()
+        widget = QWidget()
+
+        i = 0
+        for block in block_list:
+            if(block_list[i].shape == 1):
+                layout.addWidget(QCheckBox("rectangle" + " " + str(block_list[i].index), self), i, 0)
+            else:
+                layout.addWidget(QCheckBox("circle" + " " + str(block.index), self), i, 0)
+            i += 1
+
+        self.delete_button = QPushButton("Delete")
+        layout.addWidget(self.delete_button, 0, 1)
+        widget.setLayout(layout)
+
+        self.scroll = QScrollArea()
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(False)
+        self.scroll.setWidget(widget)
+        
+        gLayout = QGridLayout()
+        gLayout.addWidget(self.scroll)
+        self.setLayout(gLayout)
 
 class load_scene(QGraphicsScene):
     def __init__(self, scene):
