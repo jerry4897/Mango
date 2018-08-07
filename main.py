@@ -9,8 +9,8 @@ import menu
 click_listen = None
 num = 0
 #####
+block_list = []
 
-glo = None
 class pallete_part(QGraphicsObject):                        # pallete part : right corner of Window.         
     def __init__(self, parent=None):
         super(pallete_part, self).__init__(parent)
@@ -118,11 +118,9 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         event.setAccepted(True)
         
         pos = event.pos()
-        #pal = dropped_blocks.graphics(pos, int(event.mimeData().text()))                # Drop(Add) on the graphics
-        #dropped_blocks.graphics(pos, int(event.mimeData().text()), self.scene)
-
-        graphics(pos, int(event.mimeData().text()), self.scene)
-
+        new_block = graphics(pos, int(event.mimeData().text()), self.scene)             # Drop(Add) on the graphics
+        block_list.append(new_block)
+        #print(str(new_block.index))
         event.acceptProposedAction()
 
     def resizeEvent(self, event):
@@ -148,11 +146,11 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
     def __init__(self):
         super(Dock_Code, self).__init__()
         self.initUI()
-        
     def initUI(self):
         self.setWindowTitle('Code')
         self.plaintext = QTextEdit()
         self.plaintext.setPlainText("import torch\n")
+        self.plaintext.setAcceptDrops(False)
         self.setWidget(self.plaintext)
         self.show()
 
@@ -160,14 +158,13 @@ class Dock_Constraints(QDockWidget):
     def __init__(self):
         super(Dock_Constraints, self).__init__()
         self.setWindowTitle('Constraints')
-        #self.setWidget(menu.menu_init())
         self.show()
 
 class Window(QMainWindow):                                                 # Main window
     def __init__(self):
         QMainWindow.__init__(self)
         global click_listen
-        global dock_cons
+        #global dock_cons
         pallete_buttons = pallete()                                         
 
         scene = QGraphicsScene(0, 0, 200, 400)
@@ -185,7 +182,7 @@ class Window(QMainWindow):                                                 # Mai
         
         self.dock2 = Dock_Constraints()
         self.addDockWidget(Qt.BottomDockWidgetArea, self.dock2)
-        dock_cons = self.dock2
+        #dock_cons = self.dock2
 
         click_listen = click_listener()             #
 
@@ -204,8 +201,9 @@ class graphics_part(QGraphicsObject):                                           
         self.connect_list = []                                                      # List that save connected blocks
         self.table = menu.menu_block(self.index, self.shape, self.connect_list)
         self.table.itemChanged.connect(self.refresh_table)
-    
+        
     def mousePressEvent(self, event):
+
         if event.button() == Qt.LeftButton:                                         # drag & drop
             self.setCursor(Qt.ClosedHandCursor)
             self.table.setItem(0, 1, QTableWidgetItem(str(self.shape)))
@@ -225,13 +223,10 @@ class graphics_part(QGraphicsObject):                                           
                 click_listen.to_ = None
 
         elif event.button() == Qt.RightButton:                                      # remove
-            print("right clicked")
-            #tb = menu.TableWidget()
-            #tb.show()
-            #tb = menu.mytest()
-            #tb.show()
-            #self.update()
-            self.setParent(None)
+        
+            block_list[self.index].shape = self.shape
+            print("right clicked")            
+            window.dock2.setWidget(menu.right_click_table(block_list))
             self.update()
 
     def refresh_table(self):
@@ -244,28 +239,30 @@ class neuron_rec_(graphics_part):
         super(neuron_rec_, self).__init__()
         self.setCursor(Qt.OpenHandCursor)
         self.shape = 1
-
         self.pos_ = pos_
+
     def boundingRect(self):
         return QRectF(self.pos_.x() - 30, self.pos_.y() - 60, 60, 60)
 
     def paint(self, painter, option, widget=None):
         painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
         painter.drawRect(self.pos_.x() - 30, self.pos_.y() - 60, 60, 60)
+        painter.drawText(self.pos_.x() - 4, self.pos_.y() - 22, str(self.index))
 
 class neuron_cir_(graphics_part):
     def __init__(self, pos_):
         super(neuron_cir_, self).__init__()
         self.setCursor(Qt.OpenHandCursor)
         self.shape = 2
-
         self.pos_ = pos_
+
     def boundingRect(self):
         return QRectF(self.pos_.x()-20, self.pos_.y()-60, 40, 60)
+
     def paint(self, painter, option, widget=None):
         painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
         painter.drawEllipse(self.pos_.x() - 20, self.pos_.y() - 60, 40, 60)
-
+        painter.drawText(self.pos_.x() - 4, self.pos_.y() - 22, str(self.index))
 
 class graphics(graphics_part):
     def __init__(self, pos, shape, scene):
