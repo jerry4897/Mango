@@ -9,6 +9,7 @@ import menu
 click_listen = None
 num = 0
 #####
+shape = 1
 block_list = []
 
 class pallete_part(QGraphicsObject):                        # pallete part : right corner of Window.         
@@ -97,7 +98,6 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
     def __init__(self, scene):
         super(qgraphicsView, self).__init__()
         self.scene = scene
-        #gScene = scene
         self.setScene(self.scene)
         self.setAcceptDrops(True)
 
@@ -114,12 +114,16 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
             
     def dropEvent(self, event):
         self.dragOver = True
+        global num
         event.setDropAction(Qt.MoveAction)
         event.setAccepted(True)
         
         pos = event.pos()
         new_block = graphics(pos, int(event.mimeData().text()), self.scene)             # Drop(Add) on the graphics
         block_list.append(new_block)
+
+        print("In drop event, num = " + str(num-1))
+        block_list[len(block_list) - 1].shape = shape
         #print(str(new_block.index))
         event.acceptProposedAction()
 
@@ -164,7 +168,6 @@ class Window(QMainWindow):                                                 # Mai
     def __init__(self):
         QMainWindow.__init__(self)
         global click_listen
-        #global dock_cons
         pallete_buttons = pallete()                                         
 
         scene = QGraphicsScene(0, 0, 200, 400)
@@ -182,7 +185,6 @@ class Window(QMainWindow):                                                 # Mai
         
         self.dock2 = Dock_Constraints()
         self.addDockWidget(Qt.BottomDockWidgetArea, self.dock2)
-        #dock_cons = self.dock2
 
         click_listen = click_listener()             #
 
@@ -203,15 +205,14 @@ class graphics_part(QGraphicsObject):                                           
         self.table.itemChanged.connect(self.refresh_table)
         
     def mousePressEvent(self, event):
-
         if event.button() == Qt.LeftButton:                                         # drag & drop
             self.setCursor(Qt.ClosedHandCursor)
-            self.table.setItem(0, 1, QTableWidgetItem(str(self.shape)))
+            self.table.setItem(0, 1, QTableWidgetItem(str((self.shape))))
             print(str(self.index) + " " + str(self.shape) + " " + str(self.connect_list))
             window.dock2.setWidget(self.table)
             self.setFlag(self.ItemIsMovable, True)
-
-            if(click_listen.flag == 0):                                             # 0 : click background
+            
+            '''if(click_listen.flag == 0):                                             # 0 : click background
                 click_listen.from_ = self                                           # 1 : click block    
                 click_listen.flag = 1                                               # clock blocks consequently : connect blocks
             elif(click_listen.flag == 1):
@@ -220,18 +221,16 @@ class graphics_part(QGraphicsObject):                                           
                 arrow.arrows(click_listen.from_, click_listen.to_)
                 click_listen.flag = 0
                 click_listen.from_ = None
-                click_listen.to_ = None
+                click_listen.to_ = None'''
 
-        elif event.button() == Qt.RightButton:                                      # remove
-        
-            block_list[self.index].shape = self.shape
+        elif event.button() == Qt.RightButton:                                      # right click menu
             print("right clicked")            
-            window.dock2.setWidget(menu.right_click_table(block_list))
+            window.dock2.setWidget(menu.right_click_table(block_list, self))
             self.update()
 
     def refresh_table(self):
-        self.index = self.table.item(0,0).text()
-        self.shape = self.table.item(0,1).text()
+        #self.index = self.table.item(0,0).text()
+        #self.shape = self.table.item(0,1).text()
         self.connect_list.append(self.table.item(0,2).text())
 
 class neuron_rec_(graphics_part):
@@ -265,13 +264,15 @@ class neuron_cir_(graphics_part):
         painter.drawText(self.pos_.x() - 4, self.pos_.y() - 22, str(self.index))
 
 class graphics(graphics_part):
-    def __init__(self, pos, shape, scene):
+    def __init__(self, pos, shape_, scene):
         super(graphics, self).__init__()
         self.setFlag(self.ItemHasNoContents)
         self.scene = scene
         global num
+        global shape
 
-        if(shape == 1):
+        shape = shape_
+        if(shape_ == 1):
             print("Add Rectangle")
             self.scene.addItem(neuron_rec_(pos))
         else:
