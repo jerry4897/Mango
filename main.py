@@ -1,16 +1,14 @@
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-import dropped_blocks
 import arrow
 import menu
 
-#####
 click_listen = None
-num = 0
-#####
-shape = 1
-block_list = []
+num = 0                                                     # index of blocks.
+shape = 1                                                   # shape of blocks.
+block_list = []                                             # save all the list of blocks that are exist in main screen.
+connection_list = [[-1, -1], [-1, -1]]                          # 2-dimensional list that save the connections of blocks.
 
 class pallete_part(QGraphicsObject):                        # pallete part : right corner of Window.         
     def __init__(self, parent=None):
@@ -102,7 +100,6 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         self.setAcceptDrops(True)
 
         arrow.load_scene(self.scene)
-        menu.load_scene(self.scene)
     def dragMoveEvent(self, event):
         event.setAccepted(True)
 
@@ -122,8 +119,8 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         new_block = graphics(pos, int(event.mimeData().text()), self.scene)             # Drop(Add) on the graphics
         block_list.append(new_block)
 
-        print("In drop event, num = " + str(num-1))
         block_list[len(block_list) - 1].shape = shape
+        #print(new_block.pos)
         #print(str(new_block.index))
         event.acceptProposedAction()
 
@@ -158,7 +155,7 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
         self.setWidget(self.plaintext)
         self.show()
 
-class Dock_Constraints(QDockWidget):
+class Dock_Constraints(QDockWidget):                           # Menu / Constraints widget
     def __init__(self):
         super(Dock_Constraints, self).__init__()
         self.setWindowTitle('Constraints')
@@ -186,10 +183,13 @@ class Window(QMainWindow):                                                 # Mai
         self.dock2 = Dock_Constraints()
         self.addDockWidget(Qt.BottomDockWidgetArea, self.dock2)
 
-        click_listen = click_listener()             #
+        click_listen = click_listener()                                     # Manage click event.
 
-############################################################################################
 
+'''
+When the block dragged and dropped to the main screen(graphics),
+classes below are activated.
+'''
 class graphics_part(QGraphicsObject):                                               #
     def __init__(self, parent=None):
         super(graphics_part, self).__init__(parent)
@@ -198,34 +198,25 @@ class graphics_part(QGraphicsObject):                                           
         self.dragOver = True
         self.pos_ = None
         self.setAcceptDrops(False)
-        self.setFlag(self.ItemIsMovable, False)
         self.index = num
         self.connect_list = []                                                      # List that save connected blocks
         self.table = menu.menu_block(self.index, self.shape, self.connect_list)
         self.table.itemChanged.connect(self.refresh_table)
+        self.__mousePressPos = None
+        self.setFlag(self.ItemIsMovable, True)
         
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:                                         # drag & drop
+        self.__mousePressPos = event.pos()                          # delete?
+        if event.button() == Qt.LeftButton:                                         
             self.setCursor(Qt.ClosedHandCursor)
             self.table.setItem(0, 1, QTableWidgetItem(str((self.shape))))
             print(str(self.index) + " " + str(self.shape) + " " + str(self.connect_list))
             window.dock2.setWidget(self.table)
-            self.setFlag(self.ItemIsMovable, True)
-            
-            '''if(click_listen.flag == 0):                                             # 0 : click background
-                click_listen.from_ = self                                           # 1 : click block    
-                click_listen.flag = 1                                               # clock blocks consequently : connect blocks
-            elif(click_listen.flag == 1):
-                click_listen.to_ = self
-                click_listen.connect(self)
-                arrow.arrows(click_listen.from_, click_listen.to_)
-                click_listen.flag = 0
-                click_listen.from_ = None
-                click_listen.to_ = None'''
 
         elif event.button() == Qt.RightButton:                                      # right click menu
             print("right clicked")            
-            window.dock2.setWidget(menu.right_click_table(block_list, self))
+            #window.dock2.setWidget(menu.right_click_table(block_list, self))
+            window.dock2.setWidget(menu.right_click_table(block_list, self, connection_list))
             self.update()
 
     def refresh_table(self):
@@ -268,9 +259,10 @@ class graphics(graphics_part):
         super(graphics, self).__init__()
         self.setFlag(self.ItemHasNoContents)
         self.scene = scene
+        self.pos = pos
         global num
         global shape
-
+        global connection_list
         shape = shape_
         if(shape_ == 1):
             print("Add Rectangle")
@@ -280,6 +272,8 @@ class graphics(graphics_part):
             self.scene.addItem(neuron_cir_(pos))
 
         num += 1                                                        # index number for blocks
+        if(num == len(connection_list)):
+            menu.extend_list(connection_list)
 
     def boundingRect(self):
         return QRectF()
