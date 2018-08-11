@@ -26,8 +26,19 @@ class arrow(arrow_part):
         return QRectF(self.from_x, self.from_y-30, self.to_x, self.to_y-30)
 
     def paint(self, painter, option, widget=None):
-        painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
-        painter.drawLine(self.from_x, self.from_y-30, self.to_x, self.to_y-30)
+        painter.setPen(QPen(Qt.DashLine))
+        #painter.setPen(Qt.yellow)
+        if(self.from_x == self.to_x and self.from_y == self.to_y):
+            painter.drawLine(self.from_x + 30, self.from_y - 30, self.from_x + 60, self.from_y-30)
+            painter.drawLine(self.from_x + 60, self.from_y - 30, self.from_x + 60, self.from_y-90)
+            painter.drawLine(self.from_x + 60, self.from_y - 90, self.from_x, self.from_y-90)
+            painter.drawLine(self.from_x, self.from_y - 90, self.from_x, self.from_y-60)
+        else:
+            painter.drawLine(self.from_x, self.from_y-30, self.to_x, self.to_y-30)
+            '''self.mid_x = (self.from_x + self.to_x) / 2
+            self.mid_y = (self.from_y + self.to_y - 60) / 2
+            painter.drawLine(self.mid_x - 2, self.mid_y-2, self.mid_x, self.mid_y)
+            painter.drawLine(self.mid_x - 2, self.mid_y+2, self.mid_x, self.mid_y)'''
 
 class arrows(arrow_part):
     def __init__(self, from_x, from_y, to_x, to_y):
