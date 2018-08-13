@@ -4,7 +4,7 @@ import sys
 import main
 import arrow
 
-arrow_num = 0
+arrow_num = 0                                                   # count the number of arrows.
 '''
 Menu / Constraints widget : Bottom right screen of the window.
 '''
@@ -20,14 +20,14 @@ class menu_block(menu_set):
     def __init__(self, index, shape, connect_list):
         super(menu_block, self).__init__()
         self.resize(250, 200)
-        self.setRowCount(4)
-        self.setColumnCount(3)
+        self.setRowCount(2)
+        self.setColumnCount(5)
 
-        column_headers = ['index', 'shape', 'connections']
+        column_headers = ['name', 'activation function ', 'index', 'shape', 'connections']
         self.setHorizontalHeaderLabels(column_headers)
 
-        self.setItem(0,0, QTableWidgetItem(str(index)))
-        self.setItem(0,2, QTableWidgetItem(str(connect_list)))
+        self.setItem(0,2, QTableWidgetItem(str(index)))
+        self.setItem(0,4, QTableWidgetItem(str(connect_list)))
 
     def edititem(self, item):
         pass
@@ -41,7 +41,7 @@ class check_box_class(QGridLayout):
     def __init__(self, block_list, cur_block_index, cur_block_shape, connection_list):
         super(check_box_class, self).__init__()
         check_box_list = []
-        self.checked_list = []                   # 0 : non-checked, 1 : checked
+        self.checked_list = []                                                              # 0 : non-checked, 1 : checked
 
         if cur_block_shape == 1:
             self.addWidget(QLabel("ID : rectangle " + str(cur_block_index)), 0, 0)
@@ -51,11 +51,9 @@ class check_box_class(QGridLayout):
 
         for i in range(len(block_list)):
             check_box_list.append(check_box(cur_block_index, block_list, block_list[i].index, block_list[i].shape, self.checked_list, connection_list))
-            #check_box_list.append(check_box(cur_block_index, block_list[i], self.checked_list, connection_list))
             self.checked_list.append(0)
             self.addWidget(check_box_list[i], i+1, 1)
             if (connection_list[cur_block_index][i] > -1):
-                #check_box_list[i].setCheckState(True)
                 check_box_list[i].setChecked(True)
             else:
                 check_box_list[i].setChecked(False)
@@ -105,6 +103,7 @@ class right_click_table(QWidget):
         global list_
         list_ = block_list
         self.curr = current_block
+        self.connection_list = connection_list
 
         layout = check_box_class(block_list, current_block.index, current_block.shape, connection_list)
 
@@ -124,7 +123,7 @@ class right_click_table(QWidget):
         gLayout.addWidget(self.scroll)
         self.setLayout(gLayout)
 
-    # To remove block... Connected with 'remove' button.
+    # Remove block... Connected with 'remove' button.
     def remove_block(self):
         import sip
         for i in list_:
@@ -132,6 +131,8 @@ class right_click_table(QWidget):
                 list_.remove(i)
         sip.delete(self.curr)
         self.curr = None
+        #for i in range(len(list_)):
+        #    arrow.arrows.remove_arrow(self, )
 
 class extend_list(list):                                            # Extend the connection list.
     def __init__(self, connection_list):

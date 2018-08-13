@@ -119,6 +119,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         new_block = graphics(pos, int(event.mimeData().text()), self.scene)             # Drop(Add) on the graphics
         block_list.append(new_block)
 
+        window.dock1.plaintext.append(event.mimeData().text())
         block_list[len(block_list) - 1].shape = shape
         #print(new_block.pos)
         #print(str(new_block.index))
@@ -150,7 +151,7 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
     def initUI(self):
         self.setWindowTitle('Code')
         self.plaintext = QTextEdit()
-        self.plaintext.setPlainText("import torch\n")
+        self.plaintext.setPlainText("import tensorflow as tf\n")
         self.plaintext.setAcceptDrops(False)
         self.setWidget(self.plaintext)
         self.show()
@@ -185,7 +186,6 @@ class Window(QMainWindow):                                                 # Mai
 
         click_listen = click_listener()                                     # Manage click event.
 
-
 '''
 When the block dragged and dropped to the main screen(graphics),
 classes below are activated.
@@ -209,13 +209,12 @@ class graphics_part(QGraphicsObject):                                           
         self.__mousePressPos = event.pos()                          # delete?
         if event.button() == Qt.LeftButton:                                         
             self.setCursor(Qt.ClosedHandCursor)
-            self.table.setItem(0, 1, QTableWidgetItem(str((self.shape))))
+            self.table.setItem(0, 3, QTableWidgetItem(str((self.shape))))
             print(str(self.index) + " " + str(self.shape) + " " + str(self.connect_list))
             window.dock2.setWidget(self.table)
 
         elif event.button() == Qt.RightButton:                                      # right click menu
-            print("right clicked")            
-            #window.dock2.setWidget(menu.right_click_table(block_list, self))
+            print("right clicked")
             window.dock2.setWidget(menu.right_click_table(block_list, self, connection_list))
             self.update()
 

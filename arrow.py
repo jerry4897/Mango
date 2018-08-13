@@ -62,9 +62,11 @@ class arrows(arrow_part):
         pass
     
     def remove_arrow(self, index):
-        import sip
-        sip.delete(arrow_list[index])
-        arrow_list.remove(arrow_list[index])
+        scen.removeItem(arrow_list[index])
+        #import sip
+        #sip.delete(arrow_list[index])
+        arrow_list[index] = -1
+        #arrow_list.remove(arrow_list[index])
         scen.update()
 
 class load_scene(QGraphicsScene):
