@@ -9,6 +9,7 @@ num = 0                                                     # index of blocks.
 shape = 1                                                   # shape of blocks.
 block_list = []                                             # save all the list of blocks that are exist in main screen.
 connection_list = [[-1, -1], [-1, -1]]                      # 2-dimensional list that save the connections of blocks.
+f = open("test.txt", "w+")
 
 class pallete_part(QGraphicsObject):                        # pallete part : right corner of Window.         
     def __init__(self, parent=None):
@@ -125,6 +126,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         block_list[len(block_list) - 1].function = block_input.func
         
         window.dock1.plaintext.append("with tf.name_scope('" + block_list[len(block_list) - 1].name + "'):")
+        f.write(window.dock1.plaintext.toPlainText())
         #print(new_block.pos)
         #print(str(new_block.index))
         event.acceptProposedAction()
@@ -341,9 +343,11 @@ class click_listener():
 
 if __name__ == '__main__':
     global window
+    f.truncate(0)
     app = QApplication(sys.argv)
     window = Window()
     window.setGeometry(500, 200, 1000, 700)
     window.setWindowTitle('Mango')
     window.show()
     sys.exit(app.exec_())
+    f.close()
