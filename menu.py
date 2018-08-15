@@ -17,7 +17,7 @@ class menu_set(QTableWidget):
         print("Click" + str(row) + " " + str(col))
 
 class menu_block(menu_set):
-    def __init__(self, index, shape, connect_list):
+    def __init__(self, index, connect_list):
         super(menu_block, self).__init__()
         self.resize(250, 200)
         self.setRowCount(2)

@@ -98,8 +98,8 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         self.scene = scene
         self.setScene(self.scene)
         self.setAcceptDrops(True)
-
         arrow.load_scene(self.scene)
+
     def dragMoveEvent(self, event):
         event.setAccepted(True)
 
@@ -119,8 +119,12 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         new_block = graphics(pos, int(event.mimeData().text()), self.scene)             # Drop(Add) on the graphics
         block_list.append(new_block)
 
-        window.dock1.plaintext.append(event.mimeData().text())
+        block_input = input_block()        
         block_list[len(block_list) - 1].shape = shape
+        block_list[len(block_list) - 1].name = block_input.name
+        block_list[len(block_list) - 1].function = block_input.func
+        
+        window.dock1.plaintext.append("with tf.name_scope('" + block_list[len(block_list) - 1].name + "'):")
         #print(new_block.pos)
         #print(str(new_block.index))
         event.acceptProposedAction()
@@ -128,7 +132,38 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
     def resizeEvent(self, event):
         pass
 
-# Dock widget needed to separate window panel efficiently.
+class input_block(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.title = 'Block input'
+        self.left = 200
+        self.top = 200
+        self.width = 640
+        self.height = 480
+        self.initUI()
+        self.name
+        self.func
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+ 
+        self.name = self.getName()
+        self.func = self.getFucntion()
+ 
+        self.show()
+    def getName(self):
+        text, okPressed = QInputDialog.getText(self, "Get text","Your name:", QLineEdit.Normal, "")
+        if okPressed and text != '':
+            print(text)
+        return text
+    def getFucntion(self):
+        items = ("Relu","SoftMax")
+        item, okPressed = QInputDialog.getItem(self, "Activation Function","Activation Function:", items, 0, False)
+        if okPressed and item:
+            print(item)
+        return item
+ 
+    # Dock widget needed to separate window panel efficiently.
 class Dock_Graphics(QDockWidget):                               # Graphics (Drop Zone) Dock widget
     def __init__(self):
         super(Dock_Graphics, self).__init__()
@@ -200,7 +235,7 @@ class graphics_part(QGraphicsObject):                                           
         self.setAcceptDrops(False)
         self.index = num
         self.connect_list = []                                                      # List that save connected blocks
-        self.table = menu.menu_block(self.index, self.shape, self.connect_list)
+        self.table = menu.menu_block(self.index, self.connect_list)
         self.table.itemChanged.connect(self.refresh_table)
         self.__mousePressPos = None
         self.setFlag(self.ItemIsMovable, True)
@@ -210,6 +245,8 @@ class graphics_part(QGraphicsObject):                                           
         if event.button() == Qt.LeftButton:                                         
             self.setCursor(Qt.ClosedHandCursor)
             self.table.setItem(0, 3, QTableWidgetItem(str((self.shape))))
+            self.table.setItem(0, 0, QTableWidgetItem(str((block_list[self.index].name))))
+            self.table.setItem(0, 1, QTableWidgetItem(str((block_list[self.index].function))))
             print(str(self.index) + " " + str(self.shape) + " " + str(self.connect_list))
             window.dock2.setWidget(self.table)
 
@@ -221,7 +258,7 @@ class graphics_part(QGraphicsObject):                                           
     def refresh_table(self):
         #self.index = self.table.item(0,0).text()
         #self.shape = self.table.item(0,1).text()
-        self.connect_list.append(self.table.item(0,2).text())
+        self.connect_list.append(self.table.item(0,4).text())
 
 class neuron_rec_(graphics_part):
     def __init__(self, pos_):
@@ -259,6 +296,7 @@ class graphics(graphics_part):
         self.setFlag(self.ItemHasNoContents)
         self.scene = scene
         self.pos = pos
+        
         global num
         global shape
         global connection_list
