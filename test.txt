@@ -1,3 +1,6 @@
 import tensorflow as tf
 
-with tf.name_scope('layer10'):
+with tf.name_scope('12345'):import tensorflow as tf
+
+with tf.name_scope('12345'):
+with tf.name_scope('realtime'):
