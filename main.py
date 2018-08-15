@@ -8,7 +8,7 @@ click_listen = None
 num = 0                                                     # index of blocks.
 shape = 1                                                   # shape of blocks.
 block_list = []                                             # save all the list of blocks that are exist in main screen.
-connection_list = [[-1, -1], [-1, -1]]                          # 2-dimensional list that save the connections of blocks.
+connection_list = [[-1, -1], [-1, -1]]                      # 2-dimensional list that save the connections of blocks.
 
 class pallete_part(QGraphicsObject):                        # pallete part : right corner of Window.         
     def __init__(self, parent=None):
@@ -132,8 +132,8 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
     def resizeEvent(self, event):
         pass
 
-class input_block(QWidget):
-    def __init__(self):
+class input_block(QWidget):                                         # pop up when blocks are dropped to screen,
+    def __init__(self):                                             # It shows menu that insert the 'name' and 'activation function'. 
         super().__init__()
         self.title = 'Block input'
         self.left = 200
@@ -163,7 +163,7 @@ class input_block(QWidget):
             print(item)
         return item
  
-    # Dock widget needed to separate window panel efficiently.
+# Dock widget needed to separate window panel efficiently.
 class Dock_Graphics(QDockWidget):                               # Graphics (Drop Zone) Dock widget
     def __init__(self):
         super(Dock_Graphics, self).__init__()
