@@ -126,7 +126,10 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         block_list[len(block_list) - 1].function = block_input.func
         
         #window.dock1.plaintext.append("with tf.name_scope('" + block_list[len(block_list) - 1].name + "'):")
-        window.dock1.plaintext.append("print(\"sibal\")")
+        #window.dock1.plaintext.append("print(\"sibal\")")
+        window.dock1.plaintext.append("print(\"" + block_input.name + "\")")
+        f.seek(0)
+        f.truncate(0)
         f.write(window.dock1.plaintext.toPlainText())
         f.flush()
         
