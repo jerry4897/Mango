@@ -124,17 +124,21 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         block_list[len(block_list) - 1].shape = shape
         block_list[len(block_list) - 1].name = block_input.name
         block_list[len(block_list) - 1].function = block_input.func
+                
+        window.dock1.plaintext.append("with tf.name_scope('" + block_list[len(block_list) - 1].name + "'):\n" + "    print(\"" + block_input.name + "\")")
         
-        #window.dock1.plaintext.append("with tf.name_scope('" + block_list[len(block_list) - 1].name + "'):")
-        #window.dock1.plaintext.append("print(\"sibal\")")
-        window.dock1.plaintext.append("print(\"" + block_input.name + "\")")
         f.seek(0)
         f.truncate(0)
         f.write(window.dock1.plaintext.toPlainText())
+        print(window.dock1.plaintext.toPlainText())
         f.flush()
         
         import py_compile
-        py_compile.compile("test" + ".py" , "dest" + ".pyc")
+        try:
+            py_compile.compile("test" + ".py" , "dest" + ".pyc")
+            print("compile complete")
+        except py_compile.PyCompileError:
+            print("shit")
         
         #print(new_block.pos)
         #print(str(new_block.index))
@@ -194,13 +198,28 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
     def __init__(self):
         super(Dock_Code, self).__init__()
         self.initUI()
+
     def initUI(self):
         self.setWindowTitle('Code')
         self.plaintext = QTextEdit()
         self.plaintext.setPlainText("import tensorflow as tf\n")
         self.plaintext.setAcceptDrops(False)
+        self.plaintext.textChanged.connect(self.renew)
         self.setWidget(self.plaintext)
         self.show()
+        
+    def renew(self):
+        f.seek(0)
+        f.truncate(0)
+        f.write(self.plaintext.toPlainText())
+        f.flush()
+        
+        import py_compile
+        try:
+            py_compile.compile("test" + ".py" , "dest" + ".pyc")
+            print("compile complete!")
+        except py_compile.PyCompileError:
+            print("shit")
 
 class Dock_Constraints(QDockWidget):                           # Menu / Constraints widget
     def __init__(self):
