@@ -1,14 +1,10 @@
 import tensorflow as tf
 
-with tf.name_scope('one'):
+import numpy as np
+with tf.name_scope('input')as scope:
+    X = tf.placeholder(tf.float32, [None, 784])
+    Y = tf.placeholder(tf.float32, [None, 10])
+with tf.variable_scope('one')as scope:
     print("one")
-with tf.name_scope('two'):
+with tf.variable_scope('two')as scope:
     print("two")
-with tf.name_scope('three'):
-    print("three")
-with tf.name_scope('four'):
-    print("four")
-with tf.name_scope('five'):
-    print("five")
-with tf.name_scope('six'):
-    print("six")

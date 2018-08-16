@@ -45,8 +45,10 @@ class check_box_class(QGridLayout):
 
         if cur_block_shape == 1:
             self.addWidget(QLabel("ID : rectangle " + str(cur_block_index)), 0, 0)
-        else:
+        elif cur_block_shape == 2:
             self.addWidget(QLabel("ID : circle " + str(cur_block_index)), 0, 0)
+        else:
+            self.addWidget(QLabel("ID : iniput " + str(cur_block_index)), 0, 0)
         self.addWidget(QLabel("Connection"), 1, 0)
 
         for i in range(len(block_list)):
@@ -71,8 +73,10 @@ class check_box(QCheckBox):
 
         if(check_box_shape == 1):
             self.setText("rectangle " + str(check_box_index))
-        else:
+        elif(check_box_shape == 2):
             self.setText("circle " + str(check_box_index))
+        else:
+           self.setText("input " + str(check_box_index)) 
         self.stateChanged.connect(lambda : self.checked(connection_list))
 
     def checked(self, connection_list):
