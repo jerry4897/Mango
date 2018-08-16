@@ -137,7 +137,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
 
         block_list[len(block_list) - 1].shape = shape
         if(shape > 0):
-            block_input = input_block(0)                                         # input menu pop up
+            block_input = input_block(0)                                                # input menu pop up
             block_list[len(block_list) - 1].name = block_input.first_input
             block_list[len(block_list) - 1].function = block_input.second_input 
             window.dock1.plaintext.append("with tf.variable_scope('" + block_list[len(block_list) - 1].name + "')as scope:\n" + "    print(\"" + block_input.first_input + "\")")
@@ -154,14 +154,14 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         f.write(window.dock1.plaintext.toPlainText())
         f.flush()
         
-        import py_compile
-        try:
+        import py_compile                                               # convert plain text of 'code' to 'test.py'.
+        try:                                                            # Then, 'test.py' is compiled to 'dest.pyc'
             py_compile.compile("test" + ".py" , "dest" + ".pyc")
             print("compile complete")
         except py_compile.PyCompileError:
             print("error")
 
-        import shlex
+        import shlex                                                    # Show output of 'dest.pyc' to cmd.
         from subprocess import Popen, PIPE
         args = shlex.split("python dest.pyc")
         proc = Popen(args, stdout=PIPE, stderr=PIPE)
@@ -177,7 +177,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         pass
 
 class input_block(QWidget):                                         # pop up when blocks are dropped to screen,
-    def __init__(self, input_flag):                                             # It shows menu that insert the 'name' and 'activation function'. 
+    def __init__(self, input_flag):                                 # It shows menu that insert the 'name' and 'activation function'. 
         super().__init__()
         self.title = 'Block input'
         self.left = 200
@@ -244,7 +244,7 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
     def initUI(self):
         self.setWindowTitle('Code')
         self.plaintext = QTextEdit()
-        self.plaintext.setPlainText("import tensorflow as tf\n\nimport numpy as np")
+        self.plaintext.setPlainText("import tensorflow as tf\nimport numpy as np\n")
         self.plaintext.setAcceptDrops(False)
         self.plaintext.textChanged.connect(self.renew)
         self.setWidget(self.plaintext)
