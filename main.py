@@ -3,6 +3,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import arrow
 import menu
+import input_block
 
 click_listen = None
 num = 0                                                     # index of blocks.
@@ -139,8 +140,8 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         block_list.append(new_block)
 
         block_list[len(block_list) - 1].shape = shape
-        type_text(shape)                            # type code to plain text of 'Code' part.
-        compile_text(1)                              # copy the 'Code' to test.py and compile it to dest.pyc
+        type_text(shape)                                                                # type code to plain text of 'Code' part.
+        compile_text(1)                                                                 # copy the 'Code' to test.py and compile it to dest.pyc
         #print(new_block.pos)
         #print(str(new_block.index))
         event.acceptProposedAction()                
@@ -151,7 +152,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
 class type_text():
     def __init__(self, shape):
         super().__init__()
-        block_input = input_block(shape)
+        block_input = input_block.input_block(shape)
         block_list[len(block_list) - 1].name = block_input.first_input
         block_list[len(block_list) - 1].function = block_input.second_input
 
@@ -184,52 +185,6 @@ class compile_text():
             out, err = proc.communicate()
             #exitcode = proc.returncode
             print(out)
-
-class input_block(QWidget):                                         # pop up when blocks are dropped to screen,
-    def __init__(self, input_flag):                                 # It shows menu that insert the 'name' and 'activation function'. 
-        super().__init__()
-        self.title = 'Block input'
-        self.left = 200
-        self.top = 200
-        self.width = 640
-        self.height = 480
-        
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-        if input_flag:
-            self.initUI()
-        else:
-            self.set_input()
-
-        self.first_input
-        self.second_input
-
-    def set_input(self):                                                    # for variable_scope
-        self.first_input, okPressed = QInputDialog.getText(self, "Input parameter","Input parameter:", QLineEdit.Normal, "")
-        if okPressed and self.first_input != '':
-            print(self.first_input)
-        
-        self.second_input, okPressed = QInputDialog.getText(self, "Output parameter","Output parameter:", QLineEdit.Normal, "")
-        if okPressed and self.second_input != '':
-            print(self.second_input)
-
-    def initUI(self):                                                       # for name_scope
-        self.first_input = self.getName()
-        self.second_input = self.getFucntion()
-        self.show()
-
-    def getName(self):
-        text, okPressed = QInputDialog.getText(self, "Get name","Layer name:", QLineEdit.Normal, "")
-        if okPressed and text != '':
-            print(text)
-        return text
-
-    def getFucntion(self):
-        items = ("Relu","SoftMax")
-        item, okPressed = QInputDialog.getItem(self, "Activation Function","Activation Function:", items, 0, False)
-        if okPressed and item:
-            print(item)
-        return item
  
 # Dock widget needed to separate window panel efficiently.
 class Dock_Graphics(QDockWidget):                               # Graphics (Drop Zone) Dock widget
