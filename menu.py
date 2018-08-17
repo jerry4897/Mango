@@ -32,11 +32,12 @@ class menu_block(menu_set):
     def edititem(self, item):
         pass
 
-# Check box class
-# Every block has it's own connection list.
-# Initially every blocks are appeared in one's menu screen,
-# when you check box, blocks are connected. 
-
+'''
+Check box class.
+Every block has it's own connection list.
+Initially every blocks are appeared in one's menu screen,
+when you check box, blocks are connected. 
+'''
 class check_box_class(QGridLayout):
     def __init__(self, block_list, cur_block_index, cur_block_shape, connection_list):
         super(check_box_class, self).__init__()

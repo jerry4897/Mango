@@ -63,6 +63,7 @@ class neuron_rec(pallete_part):                                     # rectangula
 
     def boundingRect(self):
         return QRectF(0, 0, 60, 60)
+
     def paint(self, painter, option, widget=None):
         painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
         painter.drawRect(0, 0, 60, 60)
@@ -75,6 +76,7 @@ class neuron_cir(pallete_part):                                     # circle sha
 
     def boundingRect(self):
         return QRectF(80, 0, 40, 60)
+
     def paint(self, painter, option, widget=None):
         painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
         painter.drawEllipse(80, 0, 40, 60)
@@ -87,6 +89,7 @@ class input_holder(pallete_part):                                     # circle s
 
     def boundingRect(self):
         return QRectF(140, 0, 80, 40)
+
     def paint(self, painter, option, widget=None):
         painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
         painter.drawRect(140, 0, 80, 40)
@@ -136,19 +139,31 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         block_list.append(new_block)
 
         block_list[len(block_list) - 1].shape = shape
-        if(shape > 0):
-            block_input = input_block(0)                                                # input menu pop up
-            block_list[len(block_list) - 1].name = block_input.first_input
-            block_list[len(block_list) - 1].function = block_input.second_input 
-            window.dock1.plaintext.append("with tf.variable_scope('" + block_list[len(block_list) - 1].name + "')as scope:\n" + "    print(\"" + block_input.first_input + "\")")
+        type_text(shape)                            # type code to plain text of 'Code' part.
+        compile_text(1)                              # copy the 'Code' to test.py and compile it to dest.pyc
+        #print(new_block.pos)
+        #print(str(new_block.index))
+        event.acceptProposedAction()                
+
+    def resizeEvent(self, event):
+        pass
+
+class type_text():
+    def __init__(self, shape):
+        super().__init__()
+        block_input = input_block(shape)
+        block_list[len(block_list) - 1].name = block_input.first_input
+        block_list[len(block_list) - 1].function = block_input.second_input
+
+        if shape :
+            window.dock1.plaintext.append("with tf.variable_scope('" + block_list[len(block_list) - 1].name + "')as scope:\n" + "    print(\"" + block_input.first_input + "\")\n")
         else:
-            block_input = input_block(1)
-            block_list[len(block_list) - 1].name = block_input.first_input
-            block_list[len(block_list) - 1].function = block_input.second_input  
             window.dock1.plaintext.append("with tf.name_scope('" + "input" + "')as scope:")
             window.dock1.plaintext.append("    X = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].name + "])")
-            window.dock1.plaintext.append("    Y = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].function + "])")
+            window.dock1.plaintext.append("    Y = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].function + "])\n")
 
+class compile_text():
+    def __init__(self, flag_for_show_output):
         f.seek(0)
         f.truncate(0)
         f.write(window.dock1.plaintext.toPlainText())
@@ -161,20 +176,14 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         except py_compile.PyCompileError:
             print("error")
 
-        import shlex                                                    # Show output of 'dest.pyc' to cmd.
-        from subprocess import Popen, PIPE
-        args = shlex.split("python dest.pyc")
-        proc = Popen(args, stdout=PIPE, stderr=PIPE)
-        out, err = proc.communicate()
-        #exitcode = proc.returncode
-        print(out)
-        
-        #print(new_block.pos)
-        #print(str(new_block.index))
-        event.acceptProposedAction()
-
-    def resizeEvent(self, event):
-        pass
+        if flag_for_show_output:
+            import shlex                                                    # Show output of 'dest.pyc' to cmd.
+            from subprocess import Popen, PIPE
+            args = shlex.split("python dest.pyc")
+            proc = Popen(args, stdout=PIPE, stderr=PIPE)
+            out, err = proc.communicate()
+            #exitcode = proc.returncode
+            print(out)
 
 class input_block(QWidget):                                         # pop up when blocks are dropped to screen,
     def __init__(self, input_flag):                                 # It shows menu that insert the 'name' and 'activation function'. 
@@ -188,13 +197,14 @@ class input_block(QWidget):                                         # pop up whe
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
         if input_flag:
-            self.set_input()
-        else:
             self.initUI()
+        else:
+            self.set_input()
 
         self.first_input
         self.second_input
-    def set_input(self):
+
+    def set_input(self):                                                    # for variable_scope
         self.first_input, okPressed = QInputDialog.getText(self, "Input parameter","Input parameter:", QLineEdit.Normal, "")
         if okPressed and self.first_input != '':
             print(self.first_input)
@@ -203,16 +213,17 @@ class input_block(QWidget):                                         # pop up whe
         if okPressed and self.second_input != '':
             print(self.second_input)
 
-    def initUI(self): 
+    def initUI(self):                                                       # for name_scope
         self.first_input = self.getName()
         self.second_input = self.getFucntion()
- 
         self.show()
+
     def getName(self):
-        text, okPressed = QInputDialog.getText(self, "Get text","Your name:", QLineEdit.Normal, "")
+        text, okPressed = QInputDialog.getText(self, "Get name","Layer name:", QLineEdit.Normal, "")
         if okPressed and text != '':
             print(text)
         return text
+
     def getFucntion(self):
         items = ("Relu","SoftMax")
         item, okPressed = QInputDialog.getItem(self, "Activation Function","Activation Function:", items, 0, False)
@@ -232,6 +243,7 @@ class Dock_Graphics(QDockWidget):                               # Graphics (Drop
         self.graphic = qgraphicsView(self.scene)
         self.setWidget(self.graphic)
         self.show()
+
     def mousePressEvent(self, event):
         click_listen.flag = 0
         print("Click empty screen")
@@ -246,22 +258,9 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
         self.plaintext = QTextEdit()
         self.plaintext.setPlainText("import tensorflow as tf\nimport numpy as np\n")
         self.plaintext.setAcceptDrops(False)
-        self.plaintext.textChanged.connect(self.renew)
+        self.plaintext.textChanged.connect(lambda : compile_text(0))
         self.setWidget(self.plaintext)
         self.show()
-
-    def renew(self):
-        f.seek(0)
-        f.truncate(0)
-        f.write(self.plaintext.toPlainText())
-        f.flush()
-        
-        import py_compile
-        try:
-            py_compile.compile("test" + ".py" , "dest" + ".pyc")
-            print("compile complete!")
-        except py_compile.PyCompileError:
-            print("error")
 
 class Dock_Constraints(QDockWidget):                           # Menu / Constraints widget
     def __init__(self):
@@ -291,7 +290,7 @@ class Window(QMainWindow):                                                 # Mai
         self.dock2 = Dock_Constraints()
         self.addDockWidget(Qt.BottomDockWidgetArea, self.dock2)
 
-        click_listen = click_listener()                                     # Manage click event.
+        click_listen = click_listener()                                             # Manage click event.
 
 '''
 When the block dragged and dropped to the main screen(graphics),
@@ -313,7 +312,7 @@ class graphics_part(QGraphicsObject):                                           
         self.setFlag(self.ItemIsMovable, True)
         
     def mousePressEvent(self, event):
-        self.__mousePressPos = event.pos()                          # delete?
+        self.__mousePressPos = event.pos()                                          # delete?
         if event.button() == Qt.LeftButton:                                         
             self.setCursor(Qt.ClosedHandCursor)
             self.table.setItem(0, 3, QTableWidgetItem(str((self.shape))))
@@ -398,7 +397,7 @@ class graphics(graphics_part):
             print("Add Input Holder")
             self.scene.addItem(input_holder_(pos))
 
-        num += 1                                                        # index number for blocks
+        num += 1                                                                # index number for blocks
         if(num == len(connection_list)):
             menu.extend_list(connection_list)
 
@@ -417,7 +416,7 @@ class click_listener():
         self.to_ = None
 
     def connect(self, dest):
-        flag = 0                                                    # Avoid duplication
+        flag = 0                                                                # Avoid duplication
         for i in self.from_.connect_list:
             if i == dest.index:
                 flag = 1
