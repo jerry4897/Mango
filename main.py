@@ -19,6 +19,11 @@ num_classes = 0
 
 learning_rate = 0
 training_steps = 0
+batch_size = 0
+
+optimizer = ""
+loss_function = ""
+display_step = 0
 
 f = open("test.py", "w+")
 
@@ -106,6 +111,20 @@ class input_holder(pallete_part):                                     # circle s
         painter.drawRect(140, 0, 80, 40)
         painter.drawText(165, 25, "input")
 
+class output_holder(pallete_part):
+    def __init__(self, parent=None):
+        super(output_holder, self).__init__(parent)
+        self.setCursor(Qt.OpenHandCursor)
+        self.shape = 3
+
+    def boundingRect(self):
+        return QRectF(140, 60, 80, 40)
+
+    def paint(self, painter, option, widget=None):
+        painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
+        painter.drawRect(140, 60, 80, 40)
+        painter.drawText(160, 85, "output")
+
 class pallete(pallete_part):                                        # pallete activating part
     def __init__(self):
         super(pallete, self).__init__()
@@ -115,6 +134,7 @@ class pallete(pallete_part):                                        # pallete ac
         self.rectangle = neuron_rec(self)                           # activate rectangle button
         self.circle = neuron_cir(self)                              # activate circle button
         self.input_box = input_holder(self)
+        self.output_box = output_holder(self)
 
     def boundingRect(self):
         return QRectF()
@@ -151,7 +171,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
 
         block_list[len(block_list) - 1].shape = shape
         type_text(shape)                                                                # type code to plain text of 'Code' part.
-        #compile_text(1)                                                                 # copy the 'Code' to test.py and compile it to dest.pyc
+        #compile_text(1)                                                                # copy the 'Code' to test.py and compile it to dest.pyc
         #print(new_block.pos)
         #print(str(new_block.index))
         event.acceptProposedAction()                
@@ -167,7 +187,7 @@ class type_text():
             block_list[len(block_list) - 1].name, block_list[len(block_list) - 1].function, ok = input_block.input_layer.getOutput()    
         else :
             block_list[len(block_list) - 1].name, block_list[len(block_list) - 1].function, direc, ok = input_block.input_name.getOutput()
-
+        
         if shape :
             window.dock1.plaintext.append("with tf.variable_scope('" + block_list[len(block_list) - 1].name + "')as scope:\n" + "    print(\"" +  block_list[len(block_list) - 1].function + "\")\n")
         else:
@@ -176,20 +196,34 @@ class type_text():
             window.dock1.plaintext.append("    X = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].name + "])")
             window.dock1.plaintext.append("    Y = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].function + "])\n")
         """
-        if shape:                                                                           # layer input
-            name, size, func, ok = input_block.input_layer.getOutput()
-            layer_names.append(name)
-            layer_sizes.insert(num_layer, size)
-            layer_functions.append(func)
-        else :                                                                              # input_block
-            input_size, num_classes, direc, learning_rate, training_steps, ok = input_block.input_name.getOutput()
+        global num_classes
+        if shape == 0:                                                                          # input
+            input_size, num_classes, direc, learning_rate, training_steps, batch_size, ok = input_block.input_name.getOutput()
+            block_list[len(block_list) - 1].name = input_size
+            block_list[len(block_list) - 1].function = num_classes
             layer_sizes.append(input_size)
-            layer_sizes.append(num_classes)
             print(layer_sizes[0])
             print(num_classes)
             print(direc)
             print(learning_rate)
             print(training_steps)
+            print(batch_size)
+
+        elif shape < 3 :                                                                         # layer
+            name, size, func, ok = input_block.input_layer.getOutput()
+            block_list[len(block_list) - 1].name = name
+            block_list[len(block_list) - 1].function = func
+            layer_names.append(name)
+            layer_sizes.append(size)
+            layer_functions.append(func)
+        
+        else :
+            layer_names.append("output")                                                         # output
+            layer_sizes.append(num_classes)
+            loss_function, optimizer, display_step, ok = input_block.output_layer.getOutput()
+            print(loss_function)
+            print(optimizer)
+            print(display_step)
         print(layer_sizes)
              
 class compile_text():
@@ -360,6 +394,21 @@ class input_holder_(graphics_part):
         painter.drawRect(self.pos_.x() - 20, self.pos_.y() - 60, 80, 40)
         painter.drawText(self.pos_.x() + 4, self.pos_.y() - 32, "input")
 
+class output_holder_(graphics_part):
+    def __init__(self, pos_):
+        super(output_holder_, self).__init__()
+        self.setCursor(Qt.OpenHandCursor)
+        self.shape = 3
+        self.pos_ = pos_
+
+    def boundingRect(self):
+        return QRectF(self.pos_.x()-20, self.pos_.y()-60, 80, 40)
+
+    def paint(self, painter, option, widget=None):
+        painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
+        painter.drawRect(self.pos_.x() - 20, self.pos_.y() - 60, 80, 40)
+        painter.drawText(self.pos_.x(), self.pos_.y() - 32, "output")
+
 class graphics(graphics_part):
     def __init__(self, pos, shape_, scene):
         super(graphics, self).__init__()
@@ -372,17 +421,20 @@ class graphics(graphics_part):
         global shape
         global connection_list
         shape = shape_
-        if(shape_ == 1):
+        if shape_ == 1 :
             print("Add Rectangle")
             self.scene.addItem(neuron_rec_(pos))
-        elif(shape_ == 2):
+        elif shape_ == 2 :
             print("Add Circle")
             self.scene.addItem(neuron_cir_(pos))
-        else:
+        elif shape == 0 :
             print("Add Input Holder")
             self.scene.addItem(input_holder_(pos))
+        else:
+            print("Add Output Holder")
+            self.scene.addItem(output_holder_(pos))
 
-        if shape_ :
+        if shape_:
             num_layer += 1
         num += 1                                                                # index number for blocks
         if(num == len(connection_list)):
