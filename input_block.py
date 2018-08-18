@@ -2,49 +2,108 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class input_block(QWidget):                                         # pop up when blocks are dropped to screen,
-    def __init__(self, input_flag):                                 # It shows menu that insert the 'name' and 'activation function'. 
-        super().__init__()
-        self.title = 'Block input'
-        self.left = 200
-        self.top = 200
-        self.width = 640
-        self.height = 480
+class input_name(QDialog):
+    def __init__(self, parent = None):
+        super(input_name, self).__init__(parent)
+
+        layout = QGridLayout(self)
+
+        # nice widget for editing the date
+        self.input_label = QLabel("Input Parameter")
+        self.input_parameter = QLineEdit()
+
+        self.output_label = QLabel("Output Parameter")
+        self.output_parameter = QLineEdit()
         
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-        if input_flag:
-            self.initUI()
-        else:
-            self.set_input()
+        self.directory_label = QLabel("Choose Data")
+        self.directory_parameter = QFileDialog.getOpenFileNames()
+        self.directory = ""
+        if self.directory_parameter:
+            for name in self.directory_parameter:
+                self.directory = self.directory + name
 
-        self.first_input
-        self.second_input
+        self.learning_rate_label = QLabel("Learning Rate")
+        self.learning_rate = QLineEdit()
 
-    def set_input(self):                                                    # for variable_scope
-        self.first_input, okPressed = QInputDialog.getText(self, "Input parameter","Input parameter:", QLineEdit.Normal, "")
-        if okPressed and self.first_input != '':
-            print(self.first_input)
-        
-        self.second_input, okPressed = QInputDialog.getText(self, "Output parameter","Output parameter:", QLineEdit.Normal, "")
-        if okPressed and self.second_input != '':
-            print(self.second_input)
+        self.training_steps_label = QLabel("Training Steps")
+        self.training_steps = QLineEdit()
 
-    def initUI(self):                                                       # for name_scope(layer)
-        self.first_input = self.getName()
-        self.second_input = self.getFucntion()
-        self.show()
+        layout.addWidget(self.input_label, 0, 0)
+        layout.addWidget(self.input_parameter, 0, 1)
+        layout.addWidget(self.output_label, 1, 0)
+        layout.addWidget(self.output_parameter, 1, 1)
+        layout.addWidget(self.learning_rate_label, 2, 0)
+        layout.addWidget(self.learning_rate, 2, 1)
+        layout.addWidget(self.training_steps_label, 3, 0)
+        layout.addWidget(self.training_steps, 3, 1)
 
-    def getName(self):
-        text, okPressed = QInputDialog.getText(self, "Get name","Layer name:", QLineEdit.Normal, "")
-        if okPressed and text != '':
-            print(text)
-        return text
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
 
-    def getFucntion(self):
-        items = ("Relu","SoftMax")
-        item, okPressed = QInputDialog.getItem(self, "Activation Function","Activation Function:", items, 0, False)
-        if okPressed and item:
-            print(item)
-        return item
- 
+    def getData(self):
+        self.input = self.input_parameter.text()
+        self.output = self.output_parameter.text()
+        self.rate = self.learning_rate.text()
+        self.step = self.training_steps.text()
+
+        return self.input, self.output, self.directory, self.rate, self.step
+
+    # static method to create the dialog and return (date, time, accepted)
+    @staticmethod
+    def getOutput(parent = None):
+        dialog = input_name(parent)
+        result = dialog.exec_()
+        input_, output_, directory_, rate_, step_ = dialog.getData()
+        return (input_, output_, directory_, rate_, step_, result == QDialog.Accepted)
+
+class input_layer(QDialog):
+    def __init__(self, parent = None):
+        super(input_layer, self).__init__(parent)
+
+        layout = QGridLayout(self)
+
+        self.input_label = QLabel("Layer Name")
+        self.input_parameter = QLineEdit()
+
+        self.input_size = QLabel("Layer Size")
+        self.size_parameter = QLineEdit()
+
+        self.output_label = QLabel("Activation Function")
+        self.output_parameter = QComboBox()
+        self.output_parameter.addItem("relu")
+        self.output_parameter.addItem("sigmoid")
+        self.output_parameter.addItem("tanh")
+
+        layout.addWidget(self.input_label, 0, 0)
+        layout.addWidget(self.input_parameter, 0, 1)
+        layout.addWidget(self.input_size, 1, 0)
+        layout.addWidget(self.size_parameter, 1, 1)
+        layout.addWidget(self.output_label, 2, 0)
+        layout.addWidget(self.output_parameter, 2, 1)
+
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def getData(self):
+        self.name = self.input_parameter.text()
+        self.size = self.size_parameter.text()
+        self.func = self.output_parameter.currentText()
+        return self.name, self.size, self.func
+
+    # static method to create the dialog and return
+    @staticmethod
+    def getOutput(parent = None):
+        dialog = input_layer(parent)
+        result = dialog.exec_()
+        name_, size_, func_= dialog.getData()
+        return (name_, size_, func_, result == QDialog.Accepted)

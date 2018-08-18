@@ -6,10 +6,20 @@ import menu
 import input_block
 
 click_listen = None
-num = 0                                                     # index of blocks.
+num = 0                                                     # index of blocks + input box.
 shape = 1                                                   # shape of blocks.
 block_list = []                                             # save all the list of blocks that are exist in main screen.
 connection_list = [[-1, -1], [-1, -1]]                      # 2-dimensional list that save the connections of blocks.
+
+layer_names = []
+layer_functions = []
+layer_sizes = []
+num_layer = 0
+num_classes = 0
+
+learning_rate = 0
+training_steps = 0
+
 f = open("test.py", "w+")
 
 class pallete_part(QGraphicsObject):                        # pallete part : right corner of Window.         
@@ -141,7 +151,7 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
 
         block_list[len(block_list) - 1].shape = shape
         type_text(shape)                                                                # type code to plain text of 'Code' part.
-        compile_text(1)                                                                 # copy the 'Code' to test.py and compile it to dest.pyc
+        #compile_text(1)                                                                 # copy the 'Code' to test.py and compile it to dest.pyc
         #print(new_block.pos)
         #print(str(new_block.index))
         event.acceptProposedAction()                
@@ -152,17 +162,36 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
 class type_text():
     def __init__(self, shape):
         super().__init__()
-        block_input = input_block.input_block(shape)
-        block_list[len(block_list) - 1].name = block_input.first_input
-        block_list[len(block_list) - 1].function = block_input.second_input
+        """
+        if shape:
+            block_list[len(block_list) - 1].name, block_list[len(block_list) - 1].function, ok = input_block.input_layer.getOutput()    
+        else :
+            block_list[len(block_list) - 1].name, block_list[len(block_list) - 1].function, direc, ok = input_block.input_name.getOutput()
 
         if shape :
-            window.dock1.plaintext.append("with tf.variable_scope('" + block_list[len(block_list) - 1].name + "')as scope:\n" + "    print(\"" + block_input.first_input + "\")\n")
+            window.dock1.plaintext.append("with tf.variable_scope('" + block_list[len(block_list) - 1].name + "')as scope:\n" + "    print(\"" +  block_list[len(block_list) - 1].function + "\")\n")
         else:
+            window.dock1.plaintext.append("input_data = input_data.read_data_sets(\"" + direc + "\")\n")
             window.dock1.plaintext.append("with tf.name_scope('" + "input" + "')as scope:")
             window.dock1.plaintext.append("    X = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].name + "])")
             window.dock1.plaintext.append("    Y = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].function + "])\n")
-
+        """
+        if shape:                                                                           # layer input
+            name, size, func, ok = input_block.input_layer.getOutput()
+            layer_names.append(name)
+            layer_sizes.insert(num_layer, size)
+            layer_functions.append(func)
+        else :                                                                              # input_block
+            input_size, num_classes, direc, learning_rate, training_steps, ok = input_block.input_name.getOutput()
+            layer_sizes.append(input_size)
+            layer_sizes.append(num_classes)
+            print(layer_sizes[0])
+            print(num_classes)
+            print(direc)
+            print(learning_rate)
+            print(training_steps)
+        print(layer_sizes)
+             
 class compile_text():
     def __init__(self, flag_for_show_output):
         f.seek(0)
@@ -339,6 +368,7 @@ class graphics(graphics_part):
         self.pos = pos
         
         global num
+        global num_layer
         global shape
         global connection_list
         shape = shape_
@@ -352,6 +382,8 @@ class graphics(graphics_part):
             print("Add Input Holder")
             self.scene.addItem(input_holder_(pos))
 
+        if shape_ :
+            num_layer += 1
         num += 1                                                                # index number for blocks
         if(num == len(connection_list)):
             menu.extend_list(connection_list)
