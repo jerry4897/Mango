@@ -4,6 +4,7 @@ from PyQt4.QtGui import *
 import arrow
 import menu
 import input_block
+import write_code
 
 click_listen = None
 num = 0                                                     # index of blocks + input box.
@@ -16,6 +17,8 @@ layer_functions = []
 layer_sizes = []
 num_layer = 0
 num_classes = 0
+
+directory = ""
 
 learning_rate = 0
 training_steps = 0
@@ -197,17 +200,27 @@ class type_text():
             window.dock1.plaintext.append("    Y = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].function + "])\n")
         """
         global num_classes
+        global directory
+        global learning_rate
+        global training_steps
+        global batch_size
+
+        global optimizer
+        global loss_function
+        global display_step
         if shape == 0:                                                                          # input
-            input_size, num_classes, direc, learning_rate, training_steps, batch_size, ok = input_block.input_name.getOutput()
+            input_size, num_classes, directory, learning_rate, training_steps, batch_size, ok = input_block.input_name.getOutput()
             block_list[len(block_list) - 1].name = input_size
             block_list[len(block_list) - 1].function = num_classes
+            layer_names.append("input")
             layer_sizes.append(input_size)
             print(layer_sizes[0])
             print(num_classes)
-            print(direc)
+            print(directory)
             print(learning_rate)
             print(training_steps)
             print(batch_size)
+            write_code.write_input_box_process(window, layer_names, layer_sizes, num_classes, directory, learning_rate, training_steps, batch_size)
 
         elif shape < 3 :                                                                         # layer
             name, size, func, ok = input_block.input_layer.getOutput()
@@ -216,7 +229,7 @@ class type_text():
             layer_names.append(name)
             layer_sizes.append(size)
             layer_functions.append(func)
-        
+            write_code.write_input_box_process(window, layer_names, layer_sizes, num_classes, directory, learning_rate, training_steps, batch_size)
         else :
             layer_names.append("output")                                                         # output
             layer_sizes.append(num_classes)
@@ -224,7 +237,10 @@ class type_text():
             print(loss_function)
             print(optimizer)
             print(display_step)
+            write_code.write_to_dock_code(window, layer_names, layer_sizes, directory, learning_rate, training_steps, batch_size, loss_function, optimizer, display_step)
         print(layer_sizes)
+
+        #write_code.write_to_dock_code(window, layer_names, layer_sizes, direc, learning_rate, training_steps, batch_size, loss_function, optimizer, display_step)
              
 class compile_text():
     def __init__(self, flag_for_show_output):
