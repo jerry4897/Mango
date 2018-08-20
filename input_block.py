@@ -77,18 +77,18 @@ class input_layer(QDialog):
         self.input_size = QLabel("Layer Size")
         self.size_parameter = QLineEdit()
 
-        self.output_label = QLabel("Activation Function")
+        '''self.output_label = QLabel("Activation Function")
         self.output_parameter = QComboBox()
         self.output_parameter.addItem("relu")
         self.output_parameter.addItem("sigmoid")
         self.output_parameter.addItem("tanh")
-        
+        '''
         layout.addWidget(self.input_label, 0, 0)
         layout.addWidget(self.input_parameter, 0, 1)
         layout.addWidget(self.input_size, 1, 0)
         layout.addWidget(self.size_parameter, 1, 1)
-        layout.addWidget(self.output_label, 2, 0)
-        layout.addWidget(self.output_parameter, 2, 1)
+        #layout.addWidget(self.output_label, 2, 0)
+        #layout.addWidget(self.output_parameter, 2, 1)
         
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -101,16 +101,16 @@ class input_layer(QDialog):
     def getData(self):
         self.name = self.input_parameter.text()
         self.size = self.size_parameter.text()
-        self.func = self.output_parameter.currentText()
-        return self.name, self.size, self.func
+        #self.func = self.output_parameter.currentText()
+        return self.name, self.size
 
     # static method to create the dialog and return
     @staticmethod
     def getOutput(parent = None):
         dialog = input_layer(parent)
         result = dialog.exec_()
-        name_, size_, func_= dialog.getData()
-        return (name_, size_, func_, result == QDialog.Accepted)
+        name_, size_ = dialog.getData()
+        return (name_, size_, result == QDialog.Accepted)
 
 class output_layer(QDialog):
     def __init__(self, parent = None):
@@ -160,3 +160,36 @@ class output_layer(QDialog):
         result = dialog.exec_()
         loss_, optimizer_, display_ = dialog.getData()
         return (loss_, optimizer_, display_, result == QDialog.Accepted)
+
+class activation_function(QDialog):
+    def __init__(self, parent = None):
+        super(activation_function, self).__init__(parent)
+
+        layout = QGridLayout(self)
+
+        self.activation_label = QLabel("Activation Function")
+        self.activation_parameter = QLineEdit()
+
+        layout.addWidget(self.activation_label, 0, 0)
+        layout.addWidget(self.activation_parameter, 0, 1)
+        
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def getData(self):
+        self.activation = self.activation_parameter.text()
+
+        return self.activation
+
+    # static method to create the dialog and return
+    @staticmethod
+    def getOutput(parent = None):
+        dialog = activation_function(parent)
+        result = dialog.exec_()
+        activation_ = dialog.getData()
+        return (activation_, result == QDialog.Accepted)

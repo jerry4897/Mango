@@ -3,6 +3,8 @@ from PyQt4.QtGui import *
 import sys
 import main
 import arrow
+import input_block
+import write_code
 
 arrow_num = 0                                                   # count the number of arrows.
 '''
@@ -39,7 +41,7 @@ Initially every blocks are appeared in one's menu screen,
 when you check box, blocks are connected. 
 '''
 class check_box_class(QGridLayout):
-    def __init__(self, block_list, cur_block_index, cur_block_shape, connection_list):
+    def __init__(self, block_list, cur_block_index, cur_block_shape, connection_list, window):
         super(check_box_class, self).__init__()
         check_box_list = []
         self.checked_list = []                                                              # 0 : non-checked, 1 : checked
@@ -53,7 +55,7 @@ class check_box_class(QGridLayout):
         self.addWidget(QLabel("Connection"), 1, 0)
 
         for i in range(len(block_list)):
-            check_box_list.append(check_box(cur_block_index, block_list, block_list[i].index, block_list[i].shape, self.checked_list, connection_list))
+            check_box_list.append(check_box(cur_block_index, block_list, block_list[i].index, block_list[i].shape, self.checked_list, connection_list, window))
             self.checked_list.append(0)
             self.addWidget(check_box_list[i], i+1, 1)
             if (connection_list[cur_block_index][i] > -1):
@@ -62,7 +64,7 @@ class check_box_class(QGridLayout):
                 check_box_list[i].setChecked(False)
             
 class check_box(QCheckBox):
-    def __init__(self, cur_block_index, block_list, check_box_index, check_box_shape, checked_list, connection_list):
+    def __init__(self, cur_block_index, block_list, check_box_index, check_box_shape, checked_list, connection_list, window):
         super(check_box, self).__init__()
         self.cur_block_index = cur_block_index
         self.check_box_index = check_box_index
@@ -78,17 +80,25 @@ class check_box(QCheckBox):
             self.setText("circle " + str(check_box_index))
         else:
            self.setText("input " + str(check_box_index)) 
-        self.stateChanged.connect(lambda : self.checked(connection_list))
+        self.stateChanged.connect(lambda : self.checked(connection_list, window))
 
-    def checked(self, connection_list):
+    def checked(self, connection_list, window):
         global arrow_num
 
+        # Add arrow.
         if self.isChecked() == True:
             if connection_list[self.cur_block_index][self.check_box_index] == -1:
                 self.checked_list[self.check_box_index] = 1
                 connection_list[self.cur_block_index][self.check_box_index] = arrow_num
                 arrow.arrows(self.block_list[self.cur_block_index].pos.x(), self.block_list[self.cur_block_index].pos.y(), self.block_list[self.check_box_index].pos.x(), self.block_list[self.check_box_index].pos.y())
                 arrow_num += 1
+                activation_function, ok = input_block.activation_function.getOutput()
+                write_code.write_layer_process(window, self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, self.block_list[self.check_box_index].name, self.block_list[self.check_box_index].size, activation_function)
+                #tmp = main.layer_info()
+                #tmp.append_layer_text(self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, self.block_list[self.check_box_index].name, self.block_list[self.check_box_index].size, activation_function)
+                
+
+        # remove arrow.
         elif connection_list[self.cur_block_index][self.check_box_index] > -1:
             self.checked_list[self.check_box_index] = 0
             arrow.arrows.remove_arrow(self, connection_list[self.cur_block_index][self.check_box_index])
@@ -102,7 +112,7 @@ class check_box(QCheckBox):
             
 # If you click right click button this class is activated.
 class right_click_table(QWidget):
-    def __init__(self, block_list, current_block, connection_list):
+    def __init__(self, block_list, current_block, connection_list, window):
         super(right_click_table, self).__init__()
         widget = QWidget()
         global list_
@@ -110,7 +120,7 @@ class right_click_table(QWidget):
         self.curr = current_block
         self.connection_list = connection_list
 
-        layout = check_box_class(block_list, current_block.index, current_block.shape, connection_list)
+        layout = check_box_class(block_list, current_block.index, current_block.shape, connection_list, window)
 
         self.delete_button = QPushButton("Delete")
         layout.addWidget(self.delete_button, 0, 1)

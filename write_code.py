@@ -4,8 +4,29 @@ import sys
 import main
 
 class write_input_box_process():
+    def __init__(self, window, name, size, num_classes, data, learning_rate, training_epochs, batch_size):
+        window.dock1.plaintext.append("learning_rate = " + learning_rate + 
+                                     "\ntraining_epochs = " + training_epochs +
+                                     "\nbatch_size = " + batch_size)
+        window.dock1.plaintext.append("\ninput_data = input_data.read_data_sets(\""
+                                      + data + "\", one_hot = True)")
+        window.dock1.plaintext.append("\nwith tf.name_scope('" + name + "') as scope:"
+                                    + "\n\tX = tf.placeholder(tf.float32, [None, " + size + "])"
+                                    + "\n\ty = tf.placeholder(tf.float32, [None, " + num_classes + "])")
+
+class write_layer_process():
+    def __init__(self, window, from_name, from_size, to_name, to_size, activation_function):
+        window.dock1.plaintext.append("\nwith tf.variable_scope('" + to_name + "') as scope:"
+                                    + "\n\t" + to_name + "_W = tf.Variable(tf.random_normal([" + from_size + ", " + to_size + "], stddev = 0.01))"
+                                    + "\n\t" + to_name + "_b = tf.Variable(tf.random_normal([" + to_size + "]))")
+        if from_name == "input":
+            window.dock1.plaintext.append("\t" + to_name + "_L = tf.nn." + activation_function + "(tf.add(tf.matmul(" + "X, " + to_name + "_W)," + to_name + "_b))")
+        else:
+            window.dock1.plaintext.append("\t" + to_name + "_L = tf.nn." + activation_function + "(tf.add(tf.matmul(" + from_name + "_L, " + to_name + "_W)," + to_name + "_b))")
+
+'''class write_input_box_process():
     def __init__(self, window, names, sizes, num_classes, data, learning_rate, training_epochs, batch_size):
-        if(names == "input"):
+        if(len(names) == 1):
             window.dock1.plaintext.append("# store layers' weights and biases")
             window.dock1.plaintext.append("weights = []; biases = []")
             for layer in range(len(names)):
@@ -76,3 +97,4 @@ class write_to_dock_code():
         window.dock1.plaintext.append("\t# calculate accuracy")
         window.dock1.plaintext.append("\taccuracy = tf.reduce_mean(tf.cast(correct_prediction, \"float\"))")
         window.dock1.plaintext.append("\tprint(\"accuracy:\", accuracy.eval({X: data.test.images, Y: data.test.labels}))")
+'''
