@@ -101,9 +101,6 @@ class check_box(QCheckBox):
                 if(self.block_list[self.check_box_index].shape == 3):                           # output box
                     loss_function, optimizer, display_step, ok = input_block.output_layer.getOutput()
                     write_code.write_output_box_process(window, self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, loss_function, optimizer, display_step)
-                #tmp = main.layer_info()
-                #tmp.append_layer_text(self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, self.block_list[self.check_box_index].name, self.block_list[self.check_box_index].size, activation_function)
-                
 
         # remove arrow.
         elif connection_list[self.cur_block_index][self.check_box_index] > -1:
@@ -153,8 +150,6 @@ class right_click_table(QWidget):
                 list_.remove(i)
         sip.delete(self.curr)
         self.curr = None
-        #for i in range(len(list_)):
-        #    arrow.arrows.remove_arrow(self, )
 
 class extend_list(list):                                            # Extend the connection list.
     def __init__(self, connection_list):

@@ -87,8 +87,6 @@ class input_layer(QDialog):
         layout.addWidget(self.input_parameter, 0, 1)
         layout.addWidget(self.input_size, 1, 0)
         layout.addWidget(self.size_parameter, 1, 1)
-        #layout.addWidget(self.output_label, 2, 0)
-        #layout.addWidget(self.output_parameter, 2, 1)
         
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -101,7 +99,6 @@ class input_layer(QDialog):
     def getData(self):
         self.name = self.input_parameter.text()
         self.size = self.size_parameter.text()
-        #self.func = self.output_parameter.currentText()
         return self.name, self.size
 
     # static method to create the dialog and return
@@ -135,8 +132,6 @@ class output_layer(QDialog):
         layout.addWidget(self.optimizer_parameter, 1, 1)
         layout.addWidget(self.display_label, 2, 0)
         layout.addWidget(self.display_parameter, 2, 1)
-        #layout.addWidget(self.output_label, 2, 0)
-        #layout.addWidget(self.output_parameter, 2, 1)
         
         # OK and Cancel buttons
         buttons = QDialogButtonBox(

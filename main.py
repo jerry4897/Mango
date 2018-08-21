@@ -256,33 +256,7 @@ class output_block():
         
         layer_names.append("output")
         layer_sizes.append(block_list[0].num_classes)
-        #write_code.write_output_box_process(window, "output", num_classes, loss_function, optimizer, display_step)
-        #layer_functions.append(func)
-        ''''elif shape < 3 :                                                                         # layer
-            name, size, func, ok = input_block.input_layer.getOutput()
-            block_list[block_len].name = name
-            block_list[block_len].function = func
-            block_list[block_len].index = block_len
-            block_list[block_len].size = size
-
-            layer_names.append(name)
-            layer_sizes.append(size)
-            layer_functions.append(func)
-            #write_code.write_layer_process(window, layer_names, layer_sizes, num_classes, directory, learning_rate, training_steps, batch_size)
-        
-        else :
-            layer_names.append("output")                                                         # output
-            layer_sizes.append(num_classes)
-            loss_function, optimizer, display_step, ok = input_block.output_layer.getOutput()
-            print(loss_function)
-            print(optimizer)
-            print(display_step)
-            #write_code.write_to_dock_code(window, layer_names, layer_sizes, directory, learning_rate, training_steps, batch_size, loss_function, optimizer, display_step)
-        '''
-        #print(layer_sizes)
-
-        #write_code.write_to_dock_code(window, layer_names, layer_sizes, direc, learning_rate, training_steps, batch_size, loss_function, optimizer, display_step)
-             
+                   
 class compile_text():
     def __init__(self, flag_for_show_output):
         f.seek(0)
