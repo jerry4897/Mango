@@ -74,12 +74,14 @@ class check_box(QCheckBox):
         self.cur_block_index = cur_block_index
         self.check_box_index = check_box_index
 
-        if(check_box_shape == 1):
+        if check_box_shape == 1:
             self.setText("rectangle " + str(check_box_index))
-        elif(check_box_shape == 2):
+        elif check_box_shape == 2:
             self.setText("circle " + str(check_box_index))
+        elif check_box_shape == 0:
+            self.setText("input " + str(check_box_index)) 
         else:
-           self.setText("input " + str(check_box_index)) 
+            self.setText("output " + str(check_box_index))
         self.stateChanged.connect(lambda : self.checked(connection_list, window))
 
     def checked(self, connection_list, window):
@@ -92,8 +94,13 @@ class check_box(QCheckBox):
                 connection_list[self.cur_block_index][self.check_box_index] = arrow_num
                 arrow.arrows(self.block_list[self.cur_block_index].pos.x(), self.block_list[self.cur_block_index].pos.y(), self.block_list[self.check_box_index].pos.x(), self.block_list[self.check_box_index].pos.y())
                 arrow_num += 1
+
                 activation_function, ok = input_block.activation_function.getOutput()
                 write_code.write_layer_process(window, self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, self.block_list[self.check_box_index].name, self.block_list[self.check_box_index].size, activation_function)
+                
+                if(self.block_list[self.check_box_index].shape == 3):                           # output box
+                    loss_function, optimizer, display_step, ok = input_block.output_layer.getOutput()
+                    write_code.write_output_box_process(window, self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, loss_function, optimizer, display_step)
                 #tmp = main.layer_info()
                 #tmp.append_layer_text(self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, self.block_list[self.check_box_index].name, self.block_list[self.check_box_index].size, activation_function)
                 

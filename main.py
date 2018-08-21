@@ -179,19 +179,14 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         elif shape < 3:
             tmp = layer_info()
             layer_info.get_layer_info(tmp)
-        #else:
+        else:
+            output_block()
 
-        #print(new_block.pos)
-        #print(str(new_block.index))
         event.acceptProposedAction()                
 
     def resizeEvent(self, event):
         pass
 
-'''class type_text_transfer():
-    def __init__(self, from_name, from_size, to_name, to_size, activation_function):
-        super().__init__()
-        type_text()'''
 class type_text():
     def __init__(self):
         super().__init__()
@@ -203,30 +198,6 @@ class type_text():
 
     @staticmethod
     def append_input_text(parent = None):
-        """
-        if shape:
-            block_list[len(block_list) - 1].name, block_list[len(block_list) - 1].function, ok = input_block.input_layer.getOutput()    
-        else :
-            block_list[len(block_list) - 1].name, block_list[len(block_list) - 1].function, direc, ok = input_block.input_name.getOutput()
-        
-        if shape :
-            window.dock1.plaintext.append("with tf.variable_scope('" + block_list[len(block_list) - 1].name + "')as scope:\n" + "    print(\"" +  block_list[len(block_list) - 1].function + "\")\n")
-        else:
-            window.dock1.plaintext.append("input_data = input_data.read_data_sets(\"" + direc + "\")\n")
-            window.dock1.plaintext.append("with tf.name_scope('" + "input" + "')as scope:")
-            window.dock1.plaintext.append("    X = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].name + "])")
-            window.dock1.plaintext.append("    Y = tf.placeholder(tf.float32, [None, " + block_list[len(block_list) - 1].function + "])\n")
-        
-        global num_classes
-        global directory
-        global learning_rate
-        global training_steps
-        global batch_size
-
-        global optimizer
-        global loss_function
-        global display_step
-        """
         block_len = len(block_list) - 1
 
         input_size, num_classes, directory, learning_rate, training_steps, batch_size, ok = input_block.input_name.getOutput()
@@ -234,6 +205,7 @@ class type_text():
         block_list[block_len].function = "None"
         block_list[block_len].index = block_len
         block_list[block_len].size = input_size
+        block_list[0].num_classes = num_classes
 
         layer_names.append("input")
         layer_sizes.append(input_size)
@@ -267,15 +239,25 @@ class layer_info():
 class output_block():
     def __init__(self):
         super().__init__()
-        global num_classes
+        #global num_classes
         global directory
         global learning_rate
         global training_steps
         global batch_size
 
+        block_len = len(block_list) - 1
         layer_names.append("output")                                                         # output
-        layer_sizes.append(num_classes)
-        loss_function, optimizer, display_step, ok = input_block.output_layer.getOutput()
+        layer_sizes.append(block_list[0].num_classes)
+        
+        block_list[block_len].name = "output"
+        block_list[block_len].function = None
+        block_list[block_len].index = block_len
+        block_list[block_len].size = block_list[0].num_classes
+        
+        layer_names.append("output")
+        layer_sizes.append(block_list[0].num_classes)
+        #write_code.write_output_box_process(window, "output", num_classes, loss_function, optimizer, display_step)
+        #layer_functions.append(func)
         ''''elif shape < 3 :                                                                         # layer
             name, size, func, ok = input_block.input_layer.getOutput()
             block_list[block_len].name = name
