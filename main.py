@@ -5,6 +5,7 @@ import arrow
 import menu
 import input_block
 import write_code
+import mode
 
 click_listen = None
 num = 0                                                     # index of blocks + input box.
@@ -27,6 +28,9 @@ batch_size = 0
 optimizer = ""
 loss_function = ""
 display_step = 0
+
+# Spike Neural Network 
+stimulus_epoch = 0  
 
 f = open("test.py", "w+")
 
@@ -500,11 +504,19 @@ class click_listener():
 
 if __name__ == '__main__':
     global window
+    
     f.truncate(0)
     app = QApplication(sys.argv)
     window = Window()
     window.setGeometry(500, 200, 1000, 700)
     window.setWindowTitle('Mango')
     window.show()
+
+    mode_flag , ok = mode.input_mode.getOutput()
+    if mode_flag == 1:                                      # Basic Neural Network
+        pass
+    else:                                                   # Spike Neural Network
+        stimulus_epoch, ok = mode.stimulus_epoch.getOutput()
+    
     sys.exit(app.exec_())
     f.close()
