@@ -309,7 +309,7 @@ class Dock_Code(QDockWidget):                                   # Code (Code wri
     def initUI(self):
         self.setWindowTitle('Code')
         self.plaintext = QTextEdit()
-        self.plaintext.setPlainText("import tensorflow as tf\nimport numpy as np\n")
+        self.plaintext.setPlainText("import tensorflow as tf\nimport numpy as np\nimport matplotlib.pyplot as plt")
         self.plaintext.setAcceptDrops(False)
         self.plaintext.textChanged.connect(lambda : compile_text(0))
         self.setWidget(self.plaintext)

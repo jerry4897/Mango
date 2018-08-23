@@ -116,7 +116,9 @@ class output_layer(QDialog):
         layout = QGridLayout(self)
 
         self.loss_label = QLabel("Loss Function")
-        self.loss_parameter = QLineEdit()
+        #self.loss_parameter = QLineEdit()
+        self.loss_parameter = QComboBox()
+        self.loss_parameter.addItem("softmax_cross_entropy_with_logits")
 
         self.optimizer_label = QLabel("Optimizer")
         self.optimizer_parameter = QComboBox()
@@ -142,7 +144,7 @@ class output_layer(QDialog):
         layout.addWidget(buttons)
 
     def getData(self):
-        self.loss = self.loss_parameter.text()
+        self.loss = self.loss_parameter.currentText()
         self.optimizer = self.optimizer_parameter.currentText()
         self.display = self.display_parameter.text()
 

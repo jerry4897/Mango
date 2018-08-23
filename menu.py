@@ -94,14 +94,31 @@ class check_box(QCheckBox):
                 connection_list[self.cur_block_index][self.check_box_index] = arrow_num
                 arrow.arrows(self.block_list[self.cur_block_index].pos.x(), self.block_list[self.cur_block_index].pos.y(), self.block_list[self.check_box_index].pos.x(), self.block_list[self.check_box_index].pos.y())
                 arrow_num += 1
+                activation_function = ""
 
-                activation_function, ok = input_block.activation_function.getOutput()
+                if self.block_list[self.check_box_index].shape != 3:
+                    activation_function, ok = input_block.activation_function.getOutput()
                 write_code.write_layer_process(window, self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, self.block_list[self.check_box_index].name, self.block_list[self.check_box_index].size, activation_function)
                 
                 if(self.block_list[self.check_box_index].shape == 3):                           # output box
                     loss_function, optimizer, display_step, ok = input_block.output_layer.getOutput()
                     write_code.write_output_box_process(window, self.block_list[self.cur_block_index].name, self.block_list[self.cur_block_index].size, loss_function, optimizer, display_step)
+                    
+                    import py_compile                                               # convert plain text of 'code' to 'test.py'.
+                    try:                                                            # Then, 'test.py' is compiled to 'dest.pyc'
+                        py_compile.compile("test" + ".py" , "dest" + ".pyc")
+                        print("compile complete")
+                    except py_compile.PyCompileError:
+                        print("error")
 
+                    
+                    import shlex                                                    # Show output of 'dest.pyc' to cmd.
+                    from subprocess import Popen, PIPE
+                    args = shlex.split("python dest.pyc")
+                    proc = Popen(args, stdout=PIPE, stderr=PIPE)
+                    out, err = proc.communicate()
+                    #exitcode = proc.returncode
+                    print(out)
         # remove arrow.
         elif connection_list[self.cur_block_index][self.check_box_index] > -1:
             self.checked_list[self.check_box_index] = 0
