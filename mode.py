@@ -7,7 +7,8 @@ class input_mode(QDialog):
         super(input_mode, self).__init__()
         layout = QHBoxLayout(self)
         self.mode_flag = 1
-
+        self.setWindowTitle("Choose Network Mode")
+        
         self.mode1 = QRadioButton("Basic Neural Network")
         self.mode1.setChecked(True)
         self.mode1.toggled.connect(lambda:self.btnstate(self.mode1))
