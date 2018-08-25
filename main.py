@@ -25,6 +25,15 @@ learning_rate = 0
 training_steps = 0
 batch_size = 0
 
+'''
+weights = []
+biases = []
+time = []
+spikes_in = []
+spikes_network = []
+spikes_out = []
+potential = []
+'''
 optimizer = ""
 loss_function = ""
 display_step = 0
@@ -515,6 +524,9 @@ if __name__ == '__main__':
     mode_flag , ok = mode.input_mode.getOutput()
     if mode_flag == 1:                                      # Basic Neural Network
         pass
+    elif mode_flag == 2:                                    # Uncompleted...
+        write_code.cnn_process(window)
+        compile_text(1)
     else:                                                   # Spike Neural Network
         stimulus_epoch, ok = mode.stimulus_epoch.getOutput()
     

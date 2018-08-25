@@ -119,6 +119,21 @@ class check_box(QCheckBox):
                     out, err = proc.communicate()
                     #exitcode = proc.returncode
                     print(out)
+                                          
+                    try:                                                            # Then, 'test.py' is compiled to 'dest.pyc'
+                        py_compile.compile("brain_test" + ".py" , "dest1" + ".pyc")
+                        print("compile complete")
+                    except py_compile.PyCompileError:
+                        print("error")
+
+                    
+                    import shlex                                                    # Show output of 'dest.pyc' to cmd.
+                    from subprocess import Popen, PIPE
+                    args = shlex.split("python dest1.pyc")
+                    proc = Popen(args, stdout=PIPE, stderr=PIPE)
+                    out, err = proc.communicate()
+                    #exitcode = proc.returncode
+                    print(out)
         # remove arrow.
         elif connection_list[self.cur_block_index][self.check_box_index] > -1:
             self.checked_list[self.check_box_index] = 0

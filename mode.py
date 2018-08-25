@@ -5,19 +5,30 @@ from PyQt4.QtGui import *
 class input_mode(QDialog):
     def __init__(self, parent = None):
         super(input_mode, self).__init__()
-        layout = QHBoxLayout(self)
+        #layout = QHBoxLayout(self)
+        layout = QGridLayout(self)
         self.mode_flag = 1
         self.setWindowTitle("Choose Network Mode")
-        
+
+        self.logo_pix = QLabel()
+        self.logo_pix.setPixmap(QPixmap("logo.png"))
+
         self.mode1 = QRadioButton("Basic Neural Network")
         self.mode1.setChecked(True)
         self.mode1.toggled.connect(lambda:self.btnstate(self.mode1))
-        layout.addWidget(self.mode1)
+        layout.addWidget(self.mode1, 1, 0)
 
-        self.mode2 = QRadioButton("Spike Neural Network")
+        self.mode2 = QRadioButton("Convolutional Neural Network")
         self.mode2.setChecked(False)
         self.mode2.toggled.connect(lambda:self.btnstate(self.mode2))
-        layout.addWidget(self.mode2)
+
+        self.mode3 = QRadioButton("Spike Neural Network")
+        self.mode3.setChecked(False)
+        self.mode3.toggled.connect(lambda:self.btnstate(self.mode2))
+        
+        layout.addWidget(self.logo_pix, 0, 0, 1, 3)
+        layout.addWidget(self.mode2, 1, 1)
+        layout.addWidget(self.mode3, 1, 2)
 
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -29,20 +40,27 @@ class input_mode(QDialog):
 
     def btnstate(self,b):
 	
-      if b.text() == "Basic Neural Network":
-         if b.isChecked() == True:
-            print(b.text()+" is selected")
-            self.mode_flag = 1
-         else:
-            print(b.text()+" is deselected")
+        if b.text() == "Basic Neural Network":
+            if b.isChecked() == True:
+                print(b.text()+" is selected")
+                self.mode_flag = 1
+            else:
+                print(b.text()+" is deselected")
 				
-      if b.text() == "Spike Neural Network":
-         if b.isChecked() == True:
-            print(b.text()+" is selected")
-            self.mode_flag = 2
-         else:
-            print(b.text()+" is deselected")
-
+        if b.text() == "Convolutional Neural Network":
+            if b.isChecked() == True:
+                print(b.text()+" is selected")
+                self.mode_flag = 2
+            else:
+                print(b.text()+" is deselected")
+        
+        if b.text() == "Spike Neural Network":
+            if b.isChecked() == True:
+                print(b.text()+" is selected")
+                self.mode_flag = 3
+            else:
+                print(b.text()+" is deselected")
+    
     def getData(self):
         self.mode = self.mode_flag
         

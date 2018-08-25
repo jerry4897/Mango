@@ -93,3 +93,59 @@ class write_output_box_process():
 
         window.dock1.plaintext.append("getActivations(layer_1_L,imageToUse)") 
 '''
+
+class cnn_process():
+    def __init__(self, window):
+        window.dock1.plaintext.append("import math\nimport tensorflow.contrib.slim as slim\n")
+        window.dock1.plaintext.append("from tensorflow.examples.tutorials.mnist import input_data")                    
+        window.dock1.plaintext.append("\ninput_data = input_data.read_data_sets(\"./mnist.data/\", one_hot = True)")
+        
+        window.dock1.plaintext.append("tf.reset_default_graph()\n"
+                                     + "x = tf.placeholder(tf.float32, [None, 784],name=\"x-in\")\n"
+                                     + "true_y = tf.placeholder(tf.float32, [None, 10],name=\"y-in\")\n"
+                                     + "keep_prob = tf.placeholder(\"float\")\n"
+
+                                     + "\nx_image = tf.reshape(x,[-1,28,28,1])\n"
+                                     + "hidden_1 = slim.conv2d(x_image,5,[5,5])\n"
+                                     + "pool_1 = slim.max_pool2d(hidden_1,[2,2])\n"
+                                     + "hidden_2 = slim.conv2d(pool_1,5,[5,5])\n"
+                                     + "pool_2 = slim.max_pool2d(hidden_2,[2,2])\n"
+                                     + "hidden_3 = slim.conv2d(pool_2,20,[5,5])\n"
+                                     + "hidden_3 = slim.dropout(hidden_3,keep_prob)\n"
+                                     + "out_y = slim.fully_connected(slim.flatten(hidden_3),10,activation_fn=tf.nn.softmax)\n"
+
+                                     + "\ncross_entropy = -tf.reduce_sum(true_y*tf.log(out_y))\n"
+                                     + "correct_prediction = tf.equal(tf.argmax(out_y,1), tf.argmax(true_y,1))\n"
+                                     + "accuracy = tf.reduce_mean(tf.cast(correct_prediction, \"float\"))\n"
+                                     + "train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)\n\n")
+        
+        window.dock1.plaintext.append("batchSize = 50\n"
+                                    + "sess = tf.Session()\n"
+                                    + "init = tf.global_variables_initializer()\n"
+                                    + "sess.run(init)\n"
+                                    + "for i in range(1001):\n"
+                                    + "\tbatch = input_data.train.next_batch(batchSize)\n"
+                                    + "\tsess.run(train_step, feed_dict={x:batch[0],true_y:batch[1], keep_prob:0.5})\n"
+                                    + "\tif i % 100 == 0 and i != 0:\n"
+                                    + "\t\ttrainAccuracy = sess.run(accuracy, feed_dict={x:batch[0],true_y:batch[1], keep_prob:1.0})\n"
+                                    + "\t\tprint(\"step %d, training accuracy %g\"%(i, trainAccuracy))\n")
+
+        window.dock1.plaintext.append("testAccuracy = sess.run(accuracy, feed_dict={x:input_data.test.images,true_y:input_data.test.labels, keep_prob:1.0})"
+                                    + "\nprint(\"test accuracy %g\"%(testAccuracy))")
+        
+        window.dock1.plaintext.append("def getActivations(layer,stimuli):\n"
+                                    + "\tunits = sess.run(layer,feed_dict={x:np.reshape(stimuli,[1,784],order='F'),keep_prob:1.0})\n"
+                                    + "\tplotNNFilter(units)\n")
+        window.dock1.plaintext.append("def plotNNFilter(units):\n"
+                                    + "\tfilters = units.shape[3]\n"
+                                    + "\tplt.figure(1, figsize=(20,20))\n"
+                                    + "\tn_columns = 6\n"
+                                    + "\tn_rows = math.ceil(filters / n_columns) + 1\n"
+                                    + "\tfor i in range(filters):\n"
+                                    + "\t\tplt.subplot(n_rows, n_columns, i+1)\n"
+                                    + "\t\tplt.title('Filter ' + str(i))\n"
+                                    + "\t\tplt.imshow(units[0,:,:,i], interpolation=\"nearest\", cmap=\"gray\")\n")
+
+        window.dock1.plaintext.append("imageToUse = input_data.test.images[0]\n"
+                                    + "plt.imshow(np.reshape(imageToUse,[28,28]), interpolation=\"nearest\", cmap=\"gray\")\n")
+                        
