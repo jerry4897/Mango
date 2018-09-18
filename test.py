@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 learning_rate = 0.001
-training_epochs = 3
+training_epochs = 30
 batch_size = 100
 from tensorflow.examples.tutorials.mnist import input_data
 

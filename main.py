@@ -113,7 +113,7 @@ class neuron_cir(pallete_part):                                     # circle sha
         painter.setBrush(self.color.lighter(130) if self.dragOver else self.color)
         painter.drawEllipse(80, 0, 40, 60)
 
-class input_holder(pallete_part):                                     # circle shape of pallete
+class input_holder(pallete_part):                                     # Input box
     def __init__(self, parent=None):
         super(input_holder, self).__init__(parent)
         self.setCursor(Qt.OpenHandCursor)
@@ -127,7 +127,7 @@ class input_holder(pallete_part):                                     # circle s
         painter.drawRect(140, 0, 80, 40)
         painter.drawText(165, 25, "input")
 
-class output_holder(pallete_part):
+class output_holder(pallete_part):                                     # Output box
     def __init__(self, parent=None):
         super(output_holder, self).__init__(parent)
         self.setCursor(Qt.OpenHandCursor)
@@ -158,7 +158,7 @@ class pallete(pallete_part):                                        # pallete ac
     def paint(self, painter, option, widget=None):
         pass
 
-class qgraphicsView(QGraphicsView):                     # Main board Graphic View (Drop zone)
+class qgraphicsView(QGraphicsView):                                 # Main board Graphic View (Drop zone)
     def __init__(self, scene):
         super(qgraphicsView, self).__init__()
         self.scene = scene
@@ -182,17 +182,17 @@ class qgraphicsView(QGraphicsView):                     # Main board Graphic Vie
         event.setAccepted(True)
         
         pos = event.pos()
-        new_block = graphics(pos, int(event.mimeData().text()), self.scene)             # Drop(Add) on the graphics
+        new_block = graphics(pos, int(event.mimeData().text()), self.scene)                 # Drop(Add) on the graphics
         block_list.append(new_block)
 
         block_list[len(block_list) - 1].shape = shape
-        if shape == 0:
-            type_text.append_input_text()                                                                # type code to plain text of 'Code' part.
+        if shape == 0:                                                                     # When input box dropped.
+            type_text.append_input_text()                                                  # type code to plain text of 'Code' part.
             compile_text(1)                                                                # copy the 'Code' to test.py and compile it to dest.pyc
-        elif shape < 3:
+        elif shape < 3:                                                                    # When layer box dropped.
             tmp = layer_info()
             layer_info.get_layer_info(tmp)
-        else:
+        else:                                                                              # When output box dropped.
             output_block()
 
         event.acceptProposedAction()                
